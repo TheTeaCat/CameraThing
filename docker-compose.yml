@@ -1,0 +1,18 @@
+version: "2"
+services:
+  imagerec:
+    build:
+      context: './go-tensorflow-image-recognition'
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+#  tweeter:
+#    image: golang:1.16rc1-buster
+#    volumes:
+#      - ./tweeter:/go/src/tweeter
+#    working_dir: /go/src/tweeter
+#    command: go run .
+#    links:
+#      - imagerec
+#    env_file:
+#    - ./tweeter/tweeter-vars.env
