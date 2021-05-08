@@ -11,3 +11,9 @@ type LabelResult struct {
 	Label       string  `json:"label"`
 	Probability float32 `json:"probability"`
 }
+
+//A geolocation holds a latitude and a longitude
+type Geolocation struct {
+	lat  float64
+	long float64
+}

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -43,7 +44,42 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//@todo: get GPS location from request
+	//Get GPS location from request
+	latStr := r.FormValue("lat")
+	lat, err := strconv.ParseFloat(latStr, 64)
+	if latStr == "" || err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		if latStr == "" {
+			json.NewEncoder(w).Encode("No latitude supplied.")
+		} else {
+			json.NewEncoder(w).Encode("Latitude not float64")
+		}
+		return
+	} else if lat < -90 || lat > 90 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Latitude out of range (min -90, max 90)")
+		return
+	}
+	longStr := r.FormValue("long")
+	long, err := strconv.ParseFloat(longStr, 64)
+	if longStr == "" || err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		if latStr == "" {
+			json.NewEncoder(w).Encode("No longitude supplied.")
+		} else {
+			json.NewEncoder(w).Encode("Longitude not float64")
+		}
+		return
+	} else if long < -90 || long > 90 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Longitude out of range (min -90, max 90)")
+		return
+	}
+	loc := &Geolocation{lat: lat, long: long}
 
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
@@ -84,8 +120,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Make tweet
-	//@todo: Give GPS location to tweeter
-	err = myTweeter.tweetWithImage(imageTitle, imageBytes)
+	err = myTweeter.tweetWithImageAndLocation(imageTitle, imageBytes, loc)
 	if err != nil {
 		log.Printf("Failed to tweet image, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
