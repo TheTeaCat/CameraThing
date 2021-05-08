@@ -34,7 +34,7 @@ func newTweetEndpoint() (*tweetEndpoint, error) {
 
 //Endpoint handler
 func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
-	//@Check request for auth token
+	//Check request for auth token
 	authToken := r.FormValue("auth")
 	if authToken != te.authToken {
 		w.Header().Set("Content-Type", "application/json")
@@ -42,6 +42,8 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Invalid auth token")
 		return
 	}
+
+	//@todo: get GPS location from request
 
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
@@ -53,12 +55,13 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	}
 	defer imageFile.Close()
 
-	//Copy image data into buffer
+	//Get image data out into slice of bytes
 	var imageBuffer bytes.Buffer
 	io.Copy(&imageBuffer, imageFile)
+	imageBytes := imageBuffer.Bytes()
 
 	//Get image labels
-	labels, err := myRecogniser.recognise(imageBuffer.Bytes())
+	labels, err := myRecogniser.recognise(imageBytes)
 	if err != nil {
 		log.Printf("Failed to recognise image, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
@@ -80,8 +83,16 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		imageTitle = "Untitled"
 	}
 
-	//@todo: make tweet
-	log.Printf("Image named: %[1]v", imageTitle)
+	//Make tweet
+	//@todo: Give GPS location to tweeter
+	err = myTweeter.tweetWithImage(imageTitle, imageBytes)
+	if err != nil {
+		log.Printf("Failed to tweet image, err: %[1]v", err.Error())
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Failed to tweet image")
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

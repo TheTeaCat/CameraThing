@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -47,8 +48,8 @@ func newTweeter() (*tweeter, error) {
 	}
 
 	//Otherwise if creds are set, we create a client
-	token := oauth1.NewToken(accToken, accTokenSecret)
 	config := oauth1.NewConfig(conKey, conSecret)
+	token := oauth1.NewToken(accToken, accTokenSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
 	client := twitter.NewClient(httpClient)
 
@@ -76,6 +77,8 @@ recieving tweeter instance is nil, then it simply outputs the tweet that would
 be made to the logs like so:
 
 [DEV] [TWITTER] - Tweeted: Test Tweet
+
+@todo: Add GPS location to args
 */
 func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 	//If client is nil, we just log it
@@ -88,9 +91,16 @@ func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 	}
 
 	//Upload our picture
-	media, _, err := t.client.Media.Upload(image, "tweet_image")
+	media, resp, err := t.client.Media.Upload(image, "tweet_image")
 	if err != nil {
-		return err
+		log.Println(len(image))
+		if resp != nil {
+			log.Println(resp)
+		}
+		return errors.New(fmt.Sprintf(
+			"Failed to upload image, err: %[1]v",
+			err.Error(),
+		))
 	}
 
 	//Make the tweet using the media ID
@@ -98,10 +108,14 @@ func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 		tweetBody,
 		&twitter.StatusUpdateParams{
 			MediaIds: []int64{media.MediaID},
+			//@todo: Add GPS location to UpdateParams
 		},
 	)
 	if err != nil {
-		return err
+		return errors.New(fmt.Sprintf(
+			"Failed to tweet image, err: %[1]v",
+			err.Error(),
+		))
 	}
 
 	return nil
