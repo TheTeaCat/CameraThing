@@ -34,7 +34,14 @@ func newTweetEndpoint() (*tweetEndpoint, error) {
 
 //Endpoint handler
 func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
-	//@todo: check request for auth token
+	//@Check request for auth token
+	authToken := r.FormValue("auth")
+	if authToken != te.authToken {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Invalid auth token")
+		return
+	}
 
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
