@@ -61,6 +61,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		imageTitle = "Untitled"
 	}
 
+	//@todo: make tweet
 	log.Printf("Image named: %[1]v", imageTitle)
 
 	w.Header().Set("Content-Type", "application/json")

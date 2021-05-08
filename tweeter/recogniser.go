@@ -18,6 +18,7 @@ type recogniser struct {
 
 //Constructor
 func newRecogniser() *recogniser {
+	//@todo: load endpoint from env var
 	return &recogniser{
 		endpoint: "http://imagerec:8080/recognize",
 	}
