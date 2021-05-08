@@ -34,7 +34,13 @@ func main() {
 
 	//Create tweeter instance
 	log.Println("Creating tweeter instance...")
-	myTweeter = newTweeter()
+	myTweeter, err = newTweeter()
+	if err != nil {
+		log.Fatalf(
+			"Couldn't create tweeter instance, err: %[1]v",
+			err.Error(),
+		)
+	}
 
 	//Create endpoints
 	log.Println("Creating endpoint instances...")
