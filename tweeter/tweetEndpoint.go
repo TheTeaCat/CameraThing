@@ -117,7 +117,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		tweetBody = "Untitled"
 	}
 	//Add the location to the tweet
-	tweetBody += fmt.Sprintf("@ %[1]v, %[2]v", latStr, longStr)
+	tweetBody += fmt.Sprintf("(%.5f,%.5f)", lat, long)
 
 	//Make tweet
 	err = myTweeter.tweetWithImage(tweetBody, imageBytes)
