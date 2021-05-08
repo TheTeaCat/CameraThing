@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type tweetEndpoint struct {
@@ -61,11 +62,11 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 
 	//Construct a title for the image from up to the first three labels
 	imageTitle := ""
-	for i := 0; i < 3 && i < len(labels); i++ {
+	for i := 0; i < 5 && i < len(labels); i++ {
 		if i > 0 {
 			imageTitle += " "
 		}
-		imageTitle += labels[i].Label
+		imageTitle += "#" + strings.ReplaceAll(labels[i].Label, " ", "")
 	}
 	//If no labels were returned, use a default name
 	if len(labels) == 0 {
