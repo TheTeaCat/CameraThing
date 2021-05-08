@@ -8,7 +8,13 @@ The tweeter is a service which is intended to run alongside an instance of [go-t
 
 ### /tweet
 
-A `POST` request should be made to this endpoint with a multipart request body consisting of an image encoded as bytes with the key `image`, the auth token specified by the `TWEET_AUTH_TOKEN` environment variable as a `GET` parameter with the key `auth`, and a longitude and latitude as `GET` parameters with the keys `long` and `lat`.
+A `POST` request should be made to this endpoint with:
+
+- A multipart request body consisting of an image encoded as bytes with the key `image`,
+- The following `GET` parameters:
+  - `auth`, the auth token specified by the [`TWEET_AUTH_TOKEN` environment variable](#TWEET_AUTH_TOKEN).
+  - `long`, the longitude of the CameraThing where the image was taken.
+  - `lat`, the latitude of the CameraThing where the image was taken.
 
 For example, the following curl request:
 
