@@ -48,6 +48,7 @@ func main() {
 			err.Error(),
 		)
 	}
+	log.Printf("Logged into twitter as: %[1]v", myTweeter.username)
 
 	//Create endpoints
 	log.Println("Creating endpoint instances...")
