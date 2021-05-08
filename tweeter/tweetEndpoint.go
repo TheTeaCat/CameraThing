@@ -20,6 +20,7 @@ func newTweetEndpoint() *tweetEndpoint {
 	}
 }
 
+//Endpoint handler
 func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//@todo: check request for auth token
 

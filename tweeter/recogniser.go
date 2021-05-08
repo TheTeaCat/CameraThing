@@ -23,6 +23,9 @@ func newRecogniser() *recogniser {
 	}
 }
 
+/*Queries the recogniser with the provided image encoded as a slice of bytes.
+Errs if the request could not be constructed, recogniser could not be reached,
+or the recogniser returns a response that's unexpected or can't be decoded.*/
 func (r *recogniser) recognise(img []byte) ([]LabelResult, error) {
 	//Create request body with multipart writer
 	var b bytes.Buffer
