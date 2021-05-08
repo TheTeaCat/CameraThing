@@ -1,0 +1,3 @@
+[submodule "go-tensorflow-image-recognition"]
+	path = go-tensorflow-image-recognition
+	url = https://github.com/tinrab/go-tensorflow-image-recognition
