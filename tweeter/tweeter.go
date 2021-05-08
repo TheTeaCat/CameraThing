@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
@@ -69,15 +70,39 @@ func newTweeter() (*tweeter, error) {
 	}, nil
 }
 
-/*tweet makes a tweet if credentials are set, otherwise outputs to logs.*/
-func (t *tweeter) tweet(tweet string) error {
+/*tweetWithImage makes a tweet with a single image, and a tweet body. It fails
+if it cannot upload the image, or create the tweet. If the client of the
+recieving tweeter instance is nil, then it simply outputs the tweet that would
+be made to the logs like so:
+
+[DEV] [TWITTER] - Tweeted: Test Tweet
+*/
+func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 	//If client is nil, we just log it
 	if t.client == nil {
-		log.Printf("[DEV] [TWITTER] - Tweeted: %[1]v", tweet)
+		log.Printf(
+			"[DEV] [TWITTER] - Tweeted: %[1]v",
+			strings.ReplaceAll(tweetBody, "\n", "\\n"),
+		)
 		return nil
 	}
 
-	//@todo use twitter client
+	//Upload our picture
+	media, _, err := t.client.Media.Upload(image, "tweet_image")
+	if err != nil {
+		return err
+	}
+
+	//Make the tweet using the media ID
+	_, _, err = t.client.Statuses.Update(
+		tweetBody,
+		&twitter.StatusUpdateParams{
+			MediaIds: []int64{media.MediaID},
+		},
+	)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
