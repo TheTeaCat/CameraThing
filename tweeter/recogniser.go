@@ -27,7 +27,6 @@ func (r *recogniser) recognise(img []byte) ([]LabelResult, error) {
 	//Create request body with multipart writer
 	var b bytes.Buffer
 	multipartWriter := multipart.NewWriter(&b)
-	defer multipartWriter.Close()
 
 	//Create image field in request body
 	fileWriter, err := multipartWriter.CreateFormFile("image", "Untitled.jpg")
@@ -46,6 +45,9 @@ func (r *recogniser) recognise(img []byte) ([]LabelResult, error) {
 			err.Error(),
 		))
 	}
+
+	//Close the multipart writer so terminating boundary set in request
+	multipartWriter.Close()
 
 	//Create request with request body
 	req, err := http.NewRequest("POST", r.endpoint, &b)
