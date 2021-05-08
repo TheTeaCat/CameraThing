@@ -6,15 +6,31 @@ import (
 	"os"
 )
 
+type Environment string
+
+const (
+	DEV  Environment = "DEV"
+	PROD Environment = "PROD"
+)
+
+var env Environment
 var myRecogniser *recogniser
 var myTweeter *tweeter
 
 func main() {
+	var err error
+
 	log.Println("Tweeter service started.")
 
 	//Create recogniser instance
 	log.Println("Creating recogniser instance...")
-	myRecogniser = newRecogniser()
+	myRecogniser, err = newRecogniser()
+	if err != nil {
+		log.Fatalf(
+			"Couldn't create recogniser instance, err: %[1]v",
+			err.Error(),
+		)
+	}
 
 	//Create tweeter instance
 	log.Println("Creating tweeter instance...")
@@ -22,7 +38,13 @@ func main() {
 
 	//Create endpoints
 	log.Println("Creating endpoint instances...")
-	myTweetEndpoint := newTweetEndpoint()
+	myTweetEndpoint, err := newTweetEndpoint()
+	if err != nil {
+		log.Fatalf(
+			"Couldn't create tweetEndpoint instance, err: %[1]v",
+			err.Error(),
+		)
+	}
 
 	//Attach endpoint handlers
 	log.Println("Attaching endpoint handlers...")

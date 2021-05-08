@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"os"
 )
 
 //Manages a connection to our recogniser service
@@ -17,11 +18,20 @@ type recogniser struct {
 }
 
 //Constructor
-func newRecogniser() *recogniser {
-	//@todo: load endpoint from env var
-	return &recogniser{
-		endpoint: "http://imagerec:8080/recognize",
+func newRecogniser() (*recogniser, error) {
+	//Load endpoint from env var
+	endpoint, endpointSet := os.LookupEnv("RECOGNISER_ENDPOINT")
+	if !endpointSet && env == DEV {
+		//Default value if not set for dev env
+		endpoint = "http://imagerec:8080/recognize"
+	} else {
+		return nil, errors.New("RECOGNISER_ENDPOINT not set")
 	}
+
+	//Return recogniser
+	return &recogniser{
+		endpoint: endpoint,
+	}, nil
 }
 
 /*Queries the recogniser with the provided image encoded as a slice of bytes.

@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
+	"os"
 )
 
 type tweetEndpoint struct {
@@ -13,11 +15,20 @@ type tweetEndpoint struct {
 }
 
 //Constructor
-func newTweetEndpoint() *tweetEndpoint {
-	//@todo: get authToken from env var
-	return &tweetEndpoint{
-		authToken: "DEV",
+func newTweetEndpoint() (*tweetEndpoint, error) {
+	//Load authToken from env var
+	authToken, authTokenSet := os.LookupEnv("TWEET_AUTH_TOKEN")
+	if !authTokenSet && env == DEV {
+		//Default value if not set for dev env
+		authToken = "dev"
+	} else {
+		return nil, errors.New("TWEET_AUTH_TOKEN not set")
 	}
+
+	//Return tweetEndpoint
+	return &tweetEndpoint{
+		authToken: authToken,
+	}, nil
 }
 
 //Endpoint handler
