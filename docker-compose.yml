@@ -4,8 +4,6 @@ services:
     build:
       context: './go-tensorflow-image-recognition'
       dockerfile: Dockerfile
-    ports:
-      - '9500:8080'
   tweeter:
     image: golang:1.16rc1-buster
     volumes:
