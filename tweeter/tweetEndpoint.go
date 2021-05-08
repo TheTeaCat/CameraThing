@@ -56,10 +56,10 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode("Latitude not float64")
 		}
 		return
-	} else if lat < -90 || lat > 90 {
+	} else if lat < -180 || lat > 180 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Latitude out of range (min -90, max 90)")
+		json.NewEncoder(w).Encode("Latitude out of range (min -180, max 180)")
 		return
 	}
 	longStr := r.FormValue("long")
