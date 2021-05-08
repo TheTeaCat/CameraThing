@@ -54,6 +54,12 @@ func (r *recogniser) recognise(img []byte) ([]LabelResult, error) {
 
 	//Create request with request body
 	req, err := http.NewRequest("POST", r.endpoint, &b)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf(
+			"Failed to create recogniser request, err: %[1]v",
+			err.Error(),
+		))
+	}
 
 	//Set the content type, will contain the boundary
 	req.Header.Set("Content-Type", multipartWriter.FormDataContentType())
