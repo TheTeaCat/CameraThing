@@ -22,6 +22,13 @@ func main() {
 
 	log.Println("Tweeter service started.")
 
+	//Get environment from ENV
+	envString, envSet := os.LookupEnv("ENV")
+	if !envSet {
+		log.Fatalf("Environment variable ENV not set. Could not start.")
+	}
+	env = Environment(envString)
+
 	//Create recogniser instance
 	log.Println("Creating recogniser instance...")
 	myRecogniser, err = newRecogniser()
