@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -79,7 +80,6 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Longitude out of range (min -90, max 90)")
 		return
 	}
-	loc := &Geolocation{lat: lat, long: long}
 
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
@@ -106,21 +106,21 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Construct a title for the image from up to the first three labels
-	imageTitle := ""
+	/*Construct a tweetBody consisting of an image title from up to the first
+	three labels*/
+	tweetBody := ""
 	for i := 0; i < 5 && i < len(labels); i++ {
-		if i > 0 {
-			imageTitle += " "
-		}
-		imageTitle += "#" + strings.ReplaceAll(strings.Title(labels[i].Label), " ", "")
+		tweetBody += "#" + strings.ReplaceAll(strings.Title(labels[i].Label), " ", "") + " "
 	}
 	//If no labels were returned, use a default name
 	if len(labels) == 0 {
-		imageTitle = "Untitled"
+		tweetBody = "Untitled"
 	}
+	//Add the location to the tweet
+	tweetBody += fmt.Sprintf("@ %[1]v, %[2]v", latStr, longStr)
 
 	//Make tweet
-	err = myTweeter.tweetWithImageAndLocation(imageTitle, imageBytes, loc)
+	err = myTweeter.tweetWithImage(tweetBody, imageBytes)
 	if err != nil {
 		log.Printf("Failed to tweet image, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
@@ -132,6 +132,6 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{
-		"Title": imageTitle,
+		"Tweet": tweetBody,
 	})
 }

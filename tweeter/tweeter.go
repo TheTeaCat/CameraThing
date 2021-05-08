@@ -71,14 +71,14 @@ func newTweeter() (*tweeter, error) {
 	}, nil
 }
 
-/*tweetWithImageAndLocation makes a tweet with a single image, a tweet body, and
-a geolocation. It fails if it cannot upload the image, or create the tweet. If
-the client of the recieving tweeter instance is nil, then it simply outputs the
-tweet that would be made to the logs as follows:
+/*tweetWithImage makes a tweet with a single image and a tweet body. It fails if
+it cannot upload the image, or create the tweet. If the client of the recieving
+tweeter instance is nil, then it simply outputs the tweet that would be made to
+the logs as follows:
 
 [DEV] [TWITTER] - Tweeted: Test Tweet
 */
-func (t *tweeter) tweetWithImageAndLocation(tweetBody string, image []byte, loc *Geolocation) error {
+func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 	//If client is nil, we just log it
 	if t.client == nil {
 		log.Printf(
@@ -104,14 +104,10 @@ func (t *tweeter) tweetWithImageAndLocation(tweetBody string, image []byte, loc 
 	//@todo: Find place ID of nearby places to add as a placeID in the tweet.
 
 	//Make the tweet using the media ID
-	displayCoordinates := true
 	_, _, err = t.client.Statuses.Update(
 		tweetBody,
 		&twitter.StatusUpdateParams{
-			MediaIds:           []int64{media.MediaID},
-			Lat:                &loc.lat,
-			Long:               &loc.long,
-			DisplayCoordinates: &displayCoordinates,
+			MediaIds: []int64{media.MediaID},
 		},
 	)
 	if err != nil {
