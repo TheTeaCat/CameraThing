@@ -66,7 +66,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		if i > 0 {
 			imageTitle += " "
 		}
-		imageTitle += "#" + strings.ReplaceAll(labels[i].Label, " ", "")
+		imageTitle += "#" + strings.ReplaceAll(strings.Title(labels[i].Label), " ", "")
 	}
 	//If no labels were returned, use a default name
 	if len(labels) == 0 {
