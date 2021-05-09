@@ -117,5 +117,11 @@ func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 		))
 	}
 
+	//Log the successful tweet
+	log.Printf(
+		"      [TWEETER] - Successfully tweeted: %[1]v",
+		strings.ReplaceAll(tweetBody, "\n", "\\n"),
+	)
+
 	return nil
 }
