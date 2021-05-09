@@ -72,7 +72,3 @@ Your Twitter Consumer Key.
 #### `TWITTER_CONSUMER_SECRET`
 
 Your Twitter Consumer Secret.
-
-
-
-#### 
