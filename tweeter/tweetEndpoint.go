@@ -24,7 +24,7 @@ func newTweetEndpoint() (*tweetEndpoint, error) {
 	if !authTokenSet && env == DEV {
 		//Default value if not set for dev env
 		authToken = "dev"
-	} else if env == PROD {
+	} else if !authTokenSet && env == PROD {
 		return nil, errors.New("TWEET_AUTH_TOKEN not set")
 	}
 
