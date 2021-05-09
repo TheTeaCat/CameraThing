@@ -24,7 +24,7 @@ func newRecogniser() (*recogniser, error) {
 	if !endpointSet && env == DEV {
 		//Default value if not set for dev env
 		endpoint = "http://imagerec:8080/recognize"
-	} else {
+	} else if env == PROD {
 		return nil, errors.New("RECOGNISER_ENDPOINT not set")
 	}
 
