@@ -9,7 +9,7 @@ This repository should contain all the information required to create a CameraTh
 The cloud services used by the CameraThing can be run locally like so:
 
 ```bash
-git clone git@github.com:TheTeaCat/CameraThing.git
+git clone --recursive git@github.com:TheTeaCat/CameraThing.git
 cd CameraThing
 docker-compose up
 ```
