@@ -13,12 +13,6 @@
 #define WAIT_SECS(n) vTaskDelay((n*1000)/portTICK_PERIOD_MS); // n seconds
 #define WAIT_MS(n)   vTaskDelay(       n/portTICK_PERIOD_MS); // n millis
 
-String ip2str(IPAddress address) { // utility for printing IP addresses
-  return
-    String(address[0]) + "." + String(address[1]) + "." +
-    String(address[2]) + "." + String(address[3]);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // Global variables
 
@@ -33,6 +27,9 @@ bool buttonDown = false;
 //The current loop number
 int loopN = 0;
 
+//Our LED instance (we'll use PWM channel 15)
+AsyncLED myLed = AsyncLED(ledPin, 15);
+
 /////////////////////////////////////////////////////////////////////////////
 // arduino-land entry points
 
@@ -43,16 +40,6 @@ void setup() {
 
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
-
-  //Setup pins for LED & button
-  pinMode(ledPin, OUTPUT);
-
-  # ifdef CONFIG_OV7725_SUPPORT
-  Serial.println("CONFIG_OV7725_SUPPORT set!");
-  # endif
-  # ifdef CONFIG_ESP32_SPIRAM_SUPPORT
-  Serial.println("CONFIG_ESP32_SPIRAM_SUPPORT set!");
-  # endif
 
   //Setup camera (this may take a while)
   Serial.println("Setting up camera...");
@@ -77,9 +64,9 @@ void loop() {
   //Take a picture if the button has just been pressed
   if(!prevButtonDown && buttonDown){
       //Turn on the LED while the camera is reading
-      digitalWrite(ledPin, HIGH);
+      myLed.on();
       takePicture();
-      digitalWrite(ledPin, LOW);
+      myLed.off();
   }
 
   //Give background processes some time
@@ -167,8 +154,10 @@ void takePicture(){
         return;
     }
 
-    //Display the image in serial
+    //Display the image in serial (and breathe while it's happening)
+    myLed.breathe(1000);
     frameBufferToSerial(fb);
+    myLed.off();
 
     //return the frame buffer back to the driver for reuse
     esp_camera_fb_return(fb);

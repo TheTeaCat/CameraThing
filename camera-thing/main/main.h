@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "esp_camera.h"
+#include "asyncLed.h"
 
 //Main
 void setup();
