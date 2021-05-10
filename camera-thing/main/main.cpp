@@ -22,9 +22,6 @@ String ip2str(IPAddress address) { // utility for printing IP addresses
 /////////////////////////////////////////////////////////////////////////////
 // Global variables
 
-//Our web server
-// WebServer webServer(80);
-
 //The pin of the LED
 int ledPin = 26;
 //The button pin we're using
@@ -37,17 +34,68 @@ bool buttonDown = false;
 int loopN = 0;
 
 /////////////////////////////////////////////////////////////////////////////
+// arduino-land entry points
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("arduino started");
+  Serial.printf("\nwire pins: sda=%d scl=%d\n", SDA, SCL);
+
+  //Setup pin for button
+  pinMode(buttonPin, INPUT_PULLUP);
+
+  //Setup pins for LED & button
+  pinMode(ledPin, OUTPUT);
+
+  # ifdef CONFIG_OV7725_SUPPORT
+  Serial.println("CONFIG_OV7725_SUPPORT set!");
+  # endif
+  # ifdef CONFIG_ESP32_SPIRAM_SUPPORT
+  Serial.println("CONFIG_ESP32_SPIRAM_SUPPORT set!");
+  # endif
+
+  //Setup camera (this may take a while)
+  Serial.println("Setting up camera...");
+  setupCamera();
+  Serial.println("Set up camera!");
+}
+
+void loop() {
+  //Determine if the button is down
+  bool prevButtonDown = buttonDown;
+  buttonDown = digitalRead(buttonPin) == LOW;
+
+  //Log that the button state has changed
+  if(prevButtonDown != buttonDown){
+    if(buttonDown) {
+      Serial.println("Button is pressed! Taking a picture...");
+    } else {
+      Serial.println("Button is no longer pressed!");
+    }
+  }
+
+  //Take a picture if the button has just been pressed
+  if(!prevButtonDown && buttonDown){
+      //Turn on the LED while the camera is reading
+      digitalWrite(ledPin, HIGH);
+      takePicture();
+      digitalWrite(ledPin, LOW);
+  }
+
+  //Give background processes some time
+  if(loopN++ % 100000  == 0) {
+    WAIT_MS(10);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // camera config
 
-#define CONFIG_OV7725_SUPPORT 1
-
-//WROVER-KIT PIN Map
-#define CAM_PIN_PWDN    23 //power down is not used
-#define CAM_PIN_RESET   19 //software reset will be performed
+#define CAM_PIN_PWDN    23
+#define CAM_PIN_RESET   19
 #define CAM_PIN_XCLK    33
 #define CAM_PIN_SIOD    12
 #define CAM_PIN_SIOC    13
-
 #define CAM_PIN_D7      36
 #define CAM_PIN_D6      15
 #define CAM_PIN_D5       4
@@ -91,7 +139,11 @@ static camera_config_t camera_config = {
     .fb_count = 1 //if more than one, i2s runs in continuous mode. Use only with JPEG
 };
 
-esp_err_t camera_init(){
+/////////////////////////////////////////////////////////////////////////////
+// camera utils
+
+//setupCamera prepares the camera for use.
+void setupCamera(){
     //power up the camera if PWDN pin is defined
     if(CAM_PIN_PWDN != -1){
         pinMode(CAM_PIN_PWDN, OUTPUT);
@@ -102,27 +154,36 @@ esp_err_t camera_init(){
     esp_err_t err = esp_camera_init(&camera_config);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Camera Init Failed");
-        return err;
+        return;
     }
-
-    return ESP_OK;
 }
 
-esp_err_t camera_capture(){
+//takePicture gets an image from the camera's frame buffer and processes it.
+void takePicture(){
     //acquire a frame
     camera_fb_t * fb = esp_camera_fb_get();
     if (!fb) {
         ESP_LOGE(TAG, "Camera Capture Failed");
-        return ESP_FAIL;
+        return;
     }
-    //replace this with your own function
-    //process_image(fb->width, fb->height, fb->format, fb->buf, fb->len);
-  
-    Serial.println(fb->width);
-    Serial.println(fb->height);
-    Serial.println(fb->format);
-    Serial.println(fb->len);
 
+    //Display the image in serial
+    frameBufferToSerial(fb);
+
+    //return the frame buffer back to the driver for reuse
+    esp_camera_fb_return(fb);
+}
+
+//frameBufferToSerial takes a frame buffer and outputs its information to 
+//serial, including the image formatted as ASCII characters.
+void frameBufferToSerial(camera_fb_t* fb) {
+    //Display the image metadata first
+    Serial.printf(
+      "Width: %d, Height: %d, Len: %d, Format: %d\n", 
+      fb->width, fb->height, fb->len, fb->format
+    );
+
+    //Then construct an ASCII string from the buffer
     String data = "";
     String scale = " .:-=+*#%@";
     for(int i = 0; i < fb->len; i++) {
@@ -133,64 +194,7 @@ esp_err_t camera_capture(){
         data += "\n";
       }
     }
+
+    //And print it to serial
     Serial.println(data);
-
-    //return the frame buffer back to the driver for reuse
-    esp_camera_fb_return(fb);
-    return ESP_OK;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// arduino-land entry points
-
-void setup() {
-  Serial.begin(115200);
-  Serial.println("arduino started");
-  Serial.printf("\nwire pins: sda=%d scl=%d\n", SDA, SCL);
-
-  //Setup pin for button
-  pinMode(buttonPin, INPUT_PULLUP);
-
-  //Setup pins for LED & button
-  pinMode(ledPin, OUTPUT);
-
-  # ifdef CONFIG_OV7725_SUPPORT
-  Serial.println("CONFIG_OV7725_SUPPORT set!");
-  # endif
-  # ifdef CONFIG_ESP32_SPIRAM_SUPPORT
-  Serial.println("CONFIG_ESP32_SPIRAM_SUPPORT set!");
-  # endif
-
-  //Setup camera (this may take a while)
-  Serial.println("Setting up camera...");
-  camera_init();
-  Serial.println("Set up camera!");
-}
-
-void loop() {
-  //Determine if the button is down
-  bool prevButtonDown = buttonDown;
-  buttonDown = digitalRead(buttonPin) == LOW;
-
-  //Log that the button state has changed
-  if(prevButtonDown != buttonDown){
-    if(buttonDown) {
-      Serial.println("Button is pressed! Taking a picture...");
-    } else {
-      Serial.println("Button is no longer pressed!");
-    }
-  }
-
-  //Take a picture if the button has just been pressed
-  if(!prevButtonDown && buttonDown){
-      camera_capture();
-  }
-
-  //Turn on the LED if the button is down
-  digitalWrite(ledPin, (buttonDown) ? HIGH : LOW);
-
-  //Give background processes some time
-  if(loopN++ % 100000  == 0) {
-    WAIT_MS(10);
-  }
 }
