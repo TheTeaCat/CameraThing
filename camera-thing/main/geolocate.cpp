@@ -31,6 +31,7 @@ void setupGPS() {
 
 void geolocate(float* lat, float* lon, int timeout) {
   int started = millis();
+
   for(;;) {
     //Check timeout first
     int deltaT = millis()-started;
