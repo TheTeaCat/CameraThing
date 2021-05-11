@@ -9,6 +9,17 @@
 #include "asyncLed.h"
 
 /////////////////////////////////////////////////////////////////////////////
+// Debugging flags
+
+//In order to model the behaviour under less than optimal circumstances 
+//(particularly as this is using a cellular connection), MOCKDELAY can be set
+//to add a number of WAIT_MS() calls in places where there are operations that
+//_could_ take a considerable amount of time. The delays applied are the value
+//of MOCKDELAY in ms, for example MOCKDELAY=1000 would apply delays of 1 second.
+//All the instances of MOCKDELAY being used should occur in this file, main.cpp.
+#define MOCKDELAY 2500
+
+/////////////////////////////////////////////////////////////////////////////
 // utilities
 
 // delay/yield macros
@@ -55,6 +66,12 @@ void setup() {
   setupCamera();
   Serial.println("Set up camera!");
 
+  //If we're mocking delays, add 5s to the startup time.
+  #ifdef MOCKDELAY
+    Serial.printf("Mocking a longer setup time by waiting %d ms...\n", MOCKDELAY);
+    WAIT_MS(MOCKDELAY);
+  #endif
+
   //Turn LED off again now setup
   myLed.off();
 }
@@ -70,6 +87,7 @@ void loop() {
       Serial.println("[LOOP] - Button is pressed! Taking a picture...");
     } else {
       Serial.println("[LOOP] - Button is no longer pressed!");
+      myLed.off();
     }
   }
 
@@ -79,21 +97,52 @@ void loop() {
       //Taking photograph
       //Turn on the LED while the camera is reading
       myLed.on();
+
       //@todo: refactor to return JPEG data
       //takePicture();
+
+      //If we're mocking delays, delay to pretend it takes a while to get an
+      //image from the camera module
+      #ifdef MOCKDELAY
+        Serial.printf("Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
+        WAIT_MS(MOCKDELAY);
+      #endif
+
+      //Turn the LED off now the camera is done.
       myLed.off();
 
       //////////////////////////////////////////////////////////////////////
       //Geolocation
       //Communicate geolocating by throbbing with slow attack, fast decay
       myLed.throb(900,100);
+
       //Get geolocation with geolocate() function
       float lat; float lon;
       geolocate(&lat, &lon, 1000);
+
+      //If we're mocking delays, delay to pretend it takes a while to get a 
+      //geolocation from the GPS featherwing
+      #ifdef MOCKDELAY
+        Serial.printf("Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
+        WAIT_MS(MOCKDELAY);
+      #endif
+
       //Output geolocation to serial
       Serial.printf("[LOOP] - Got geolocation, lat: %f, long: %f\n", lat, lon);
-      //Stop throbbing
+
+      //Turn the LED off now the GPS is done.
       myLed.off();
+
+      //////////////////////////////////////////////////////////////////////
+      //Upload
+
+      //@todo
+
+      //////////////////////////////////////////////////////////////////////
+      //Buttondown warning     
+      //Start flashing quickly (will only stay on if the button is still pressed
+      //down; otherwise turned off in the next loop)
+      myLed.blink(100);
   }
 
   //Give background processes some time
