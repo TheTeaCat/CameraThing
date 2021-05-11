@@ -1,15 +1,3 @@
-#include <Arduino.h>
-#include "camera.h"
-#include "asyncLed.h"
-
-//Main
+// Main entry points
 void setup();
 void loop();
-
-//Geolocation util
-void geolocate(float* lat, float* lon, int timeout);
-
-//Camera utils
-void setupCamera();
-void takePicture();
-void frameBufferToSerial(camera_fb_t*);

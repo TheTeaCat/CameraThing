@@ -1,10 +1,12 @@
 // main.cpp
-// main entry points
+// Main entry points
 
 #include <Arduino.h>
-#include <main.h>
+#include "main.h"
+#include "utils.h"
 #include "camera.h"
-#include <Adafruit_GPS.h>
+#include "geolocate.h"
+#include "asyncLed.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // utilities
@@ -31,10 +33,6 @@ int loopN = 0;
 //Our LED instance (we'll use PWM channel 15)
 AsyncLED myLed = AsyncLED(ledPin, 15);
 
-//Our GPS instance
-#define GPSSerial Serial1
-Adafruit_GPS GPS(&GPSSerial);
-
 /////////////////////////////////////////////////////////////////////////////
 // arduino-land entry points
 
@@ -45,24 +43,17 @@ void setup() {
 
   //Make LED breathe during setup
   myLed.breathe(500);
-  WAIT_MS(10000);
 
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
 
-  //Setup camera (this may take a while)
+  //Setup GPS
+  setupGPS();
+
+  //Setup camera (this may take a while if something has gone wrong)
   Serial.println("Setting up camera...");
   setupCamera();
   Serial.println("Set up camera!");
-
-  //9600 NMEA is default baud for Adafruit GPS board
-  GPS.begin(9600);
-  //We only one the GPGGA
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
-  //Set update rate to 1HS
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-  //We ain't using an antenna stop giving me $PGTOP sentences I don't care
-  GPS.sendCommand(PGCMD_NOANTENNA);
 
   //Turn LED off again now setup
   myLed.off();
@@ -108,48 +99,5 @@ void loop() {
   //Give background processes some time
   if(loopN++ % 100000  == 0) {
     WAIT_MS(10);
-  }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// GPS util
-
-// Uncomment this to send the last NMEA from the GPS to serial
-// # define PRINTLASTNMEA
-
-void geolocate(float* lat, float* lon, int timeout) {
-  int started = millis();
-  for(;;) {
-    //Check timeout first
-    int deltaT = millis()-started;
-    if (deltaT > timeout) {
-      return;
-    }
-
-    //Read from GPS
-    GPS.read();
-
-    //Attempt to parse new NMEA if recieved...
-    if (GPS.newNMEAreceived()) {
-      //Print it to serial before parsing if debugging
-      #ifdef PRINTLASTNMEA
-        Serial.println(GPS.lastNMEA());
-      #endif
-
-      if (!GPS.parse(GPS.lastNMEA())) {
-        //If it doesn't parse, loop again
-        Serial.printf("[GEOLOCATE] - Failed to parse NMEA, deltaT: %d ms\n", deltaT);
-        continue;
-      }
-
-      //Otherwise print success if debugging...
-      Serial.printf("[GEOLOCATE] - Successfully parsed NMEA, deltaT: %d ms\n", deltaT);
-      Serial.printf("[GEOLOCATE] - lat: %f, long: %f\n", GPS.latitudeDegrees, GPS.longitudeDegrees);
-
-      //...and set the lat and lon in the pointers given
-      *lat = GPS.latitudeDegrees;
-      *lon = GPS.longitudeDegrees;
-      return;
-    };
   }
 }

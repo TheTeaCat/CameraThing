@@ -1,5 +1,5 @@
 // camera.cpp
-// config and utils for dealing with the camera
+// Config and utils for dealing with the camera
 
 #include <Arduino.h>
 #include "esp_camera.h"

@@ -1,4 +1,6 @@
-#include <Arduino.h>
+// camera.h
+// Exports the utils for dealing with the camera
+
 #include "esp_camera.h"
 
 //Utils

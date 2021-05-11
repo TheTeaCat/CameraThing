@@ -1,7 +1,14 @@
-#include <Arduino.h>
-#include <asyncLed.h>
+// asyncLed.cpp
+// Defines a handy AsyncLED class for animating an LED without blocking the main
+// thread using PWM
 
-//Constructor
+#include <Arduino.h>
+#include "utils.h"
+#include "asyncLed.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// Constructor
+
 AsyncLED::AsyncLED(int p, int c) {
   pin = p;
   channel = c;
