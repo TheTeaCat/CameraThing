@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "camera.h"
 #include "geolocate.h"
+#include "wifiClient.h"
 #include "asyncLed.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -65,6 +66,11 @@ void setup() {
   Serial.println("Setting up camera...");
   setupCamera();
   Serial.println("Set up camera!");
+
+  //Setup wifi (this may also take a while)
+  Serial.println("Setting up WiFi...");
+  setupWifiManager();
+  Serial.println("Set up WiFi!");
 
   //If we're mocking delays, add 5s to the startup time.
   #ifdef MOCKDELAY

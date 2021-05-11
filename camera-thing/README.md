@@ -3,6 +3,10 @@
 The IoT device!
 
 
+## Setup
+
+Wifi credentials must be set in `secrets.h`. An example can be found in `secrets.example.h`.
+
 
 ## Debugging
 
