@@ -29,4 +29,5 @@ class AsyncLED {
     //Animations
     void blink(int delay);
     void breathe(int period);
+    void throb(int attackTime, int decayTime);
 };

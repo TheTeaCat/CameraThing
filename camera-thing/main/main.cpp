@@ -155,7 +155,7 @@ void takePicture(){
     }
 
     //Display the image in serial (and breathe while it's happening)
-    myLed.breathe(1000);
+    myLed.throb(100,900);
     frameBufferToSerial(fb);
     myLed.off();
 

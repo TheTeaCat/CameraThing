@@ -130,6 +130,72 @@ void AsyncLED::breathe(int period) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Throb animation
+// A throbbing animation cycles on->off->on like breathe but has a different  
+// attack (off->on) to decay (on->off) period, so it can seem less or more 
+// aggressive than the standard breathing by altering the ratio between the 
+// durations, and overall durations of these two attack and decay values.
+// `attack` and `decay` are both periods in milliseconds.
+
+struct throbAnimationParams {
+  int pin;
+  int channel;
+  int attack;
+  int decay;
+};
+
+throbAnimationParams* currThrobAnimationParams;
+
+void AsyncLED::throb(int attack, int decay) {
+  //Create animation params
+  currThrobAnimationParams = new throbAnimationParams{pin,channel,attack,decay};
+
+  //Declate animation loop used for this animation
+  auto throbAnimationLoop = [](void* p) {
+    Serial.println("Starting breathe...");
+
+    //Cast void pointer to animation params
+    throbAnimationParams* params = (throbAnimationParams*)p;
+
+    //Get vals from params struct
+    float attack = (float)(params->attack);
+    float decay = (float)(params->decay);
+
+    //Start our animation loop!
+    int start = millis();
+    for(;;) {
+      //Calculate a new duty cycle
+      int now = millis();
+      float pos = fmod((float)(now-start), (attack+decay));
+      int dutyCycle = 0;
+      if (pos < attack) {
+        dutyCycle = round(255.0 * ((1.0 - cos((pos/attack) * M_PI)) / 2.0));
+      } else {
+        dutyCycle = round(255.0 * ((1.0 + cos(((pos-attack)/decay) * M_PI)) / 2.0));
+      }
+      //Write the dutyCycle to the channel
+      ledcWrite(params->channel, dutyCycle);
+      //Do it again in 30ms
+      WAIT_MS(30);
+    }
+  };
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
+
+  //Create new animation task
+  xTaskCreatePinnedToCore(
+    throbAnimationLoop, "throbAnimationLoop", 10000, currThrobAnimationParams, 1, &animationTask, 0
+  );
+
+  //Tell everyone we're animating now.
+  animating = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Animation utils
 
 //killAnimation stops any currently running animations.
@@ -152,6 +218,11 @@ void AsyncLED::killAnimation() {
     Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting breathe animation params\n", pin);
     delete(currBreatheAnimationParams);
     currBreatheAnimationParams = nullptr;
+  }
+  if (currBreatheAnimationParams != nullptr) {
+    Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting throb animation params\n", pin);
+    delete(currThrobAnimationParams);
+    currThrobAnimationParams = nullptr;
   }
 
   //Set animating flag to false so we don't try and delete a null task later
