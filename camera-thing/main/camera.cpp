@@ -49,7 +49,7 @@ static camera_config_t camera_config = {
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
-    .pixel_format = PIXFORMAT_GRAYSCALE,//YUV422,GRAYSCALE,RGB565,JPEG
+    .pixel_format = PIXFORMAT_RGB888,//YUV422,GRAYSCALE,RGB565,JPEG
     .frame_size = FRAMESIZE_QQVGA,//QQVGA-QXGA Do not use sizes above QVGA when not JPEG
 
     .jpeg_quality = 12, //0-63 lower number means higher quality
@@ -84,7 +84,7 @@ void takePicture(){
         return;
     }
 
-    //Display the image in serial (and breathe while it's happening)
+    //Display the image in serial
     frameBufferToSerial(fb);
 
     //return the frame buffer back to the driver for reuse
@@ -106,8 +106,7 @@ void frameBufferToSerial(camera_fb_t* fb) {
     for(int i = 0; i < fb->len; i++) {
       uint8_t v = *(fb->buf+i);
       data += scale[v/26];
-      data += scale[v/26];
-      if(i % fb->width == 0) {
+      if(i % (fb->width*3) == 0) {
         data += "\n";
       }
     }
