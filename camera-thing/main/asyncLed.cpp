@@ -88,13 +88,13 @@ struct breatheAnimationParams {
 breatheAnimationParams* currBreatheAnimationParams;
 
 void AsyncLED::breathe(int period) {
+  Serial.printf("[AsyncLED.breathe] [Pin %d] - Breathing with %d ms period\n", pin, period);
+
   //Create animation params
   currBreatheAnimationParams = new breatheAnimationParams{pin,channel,period};
 
   //Declate animation loop used for this animation
   auto breatheAnimationLoop = [](void* p) {
-    Serial.println("Starting breathe...");
-
     //Cast void pointer to animation params
     breatheAnimationParams* params = (breatheAnimationParams*)p;
 
@@ -147,13 +147,13 @@ struct throbAnimationParams {
 throbAnimationParams* currThrobAnimationParams;
 
 void AsyncLED::throb(int attack, int decay) {
+  Serial.printf("[AsyncLED.throb] [Pin %d] - Throbbing with %d ms attack and %d ms decay\n", pin, attack, decay);
+
   //Create animation params
   currThrobAnimationParams = new throbAnimationParams{pin,channel,attack,decay};
 
   //Declate animation loop used for this animation
   auto throbAnimationLoop = [](void* p) {
-    Serial.println("Starting breathe...");
-
     //Cast void pointer to animation params
     throbAnimationParams* params = (throbAnimationParams*)p;
 
