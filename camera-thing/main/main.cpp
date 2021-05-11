@@ -68,7 +68,7 @@ void setup() {
 
   //If we're mocking delays, add 5s to the startup time.
   #ifdef MOCKDELAY
-    Serial.printf("Mocking a longer setup time by waiting %d ms...\n", MOCKDELAY);
+    Serial.printf("[MockDelay] - Mocking a longer setup time by waiting %d ms...\n", MOCKDELAY);
     WAIT_MS(MOCKDELAY);
   #endif
 
@@ -84,9 +84,9 @@ void loop() {
   //Log that the button state has changed
   if(prevButtonDown != buttonDown){
     if(buttonDown) {
-      Serial.println("[LOOP] - Button is pressed! Taking a picture...");
+      Serial.println("[Loop] - Button is pressed! Taking a picture...");
     } else {
-      Serial.println("[LOOP] - Button is no longer pressed!");
+      Serial.println("[Loop] - Button is no longer pressed!");
       myLed.off();
     }
   }
@@ -104,7 +104,7 @@ void loop() {
       //If we're mocking delays, delay to pretend it takes a while to get an
       //image from the camera module
       #ifdef MOCKDELAY
-        Serial.printf("Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
+        Serial.printf("[MockDelay] - Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
         WAIT_MS(MOCKDELAY);
       #endif
 
@@ -123,12 +123,12 @@ void loop() {
       //If we're mocking delays, delay to pretend it takes a while to get a 
       //geolocation from the GPS featherwing
       #ifdef MOCKDELAY
-        Serial.printf("Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
+        Serial.printf("[MockDelay] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
         WAIT_MS(MOCKDELAY);
       #endif
 
       //Output geolocation to serial
-      Serial.printf("[LOOP] - Got geolocation, lat: %f, long: %f\n", lat, lon);
+      Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
 
       //Turn the LED off now the GPS is done.
       myLed.off();

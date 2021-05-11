@@ -51,13 +51,13 @@ void geolocate(float* lat, float* lon, int timeout) {
 
       if (!GPS.parse(GPS.lastNMEA())) {
         //If it doesn't parse, loop again
-        Serial.printf("[GEOLOCATE] - Failed to parse NMEA, deltaT: %d ms\n", deltaT);
+        Serial.printf("[Geolocate] - Failed to parse NMEA, deltaT: %d ms\n", deltaT);
         continue;
       }
 
       //Otherwise print success if debugging...
-      Serial.printf("[GEOLOCATE] - Successfully parsed NMEA, deltaT: %d ms\n", deltaT);
-      Serial.printf("[GEOLOCATE] - lat: %f, long: %f\n", GPS.latitudeDegrees, GPS.longitudeDegrees);
+      Serial.printf("[Geolocate] - Successfully parsed NMEA, deltaT: %d ms\n", deltaT);
+      Serial.printf("[Geolocate] - lat: %f, long: %f\n", GPS.latitudeDegrees, GPS.longitudeDegrees);
 
       //...and set the lat and lon in the pointers given
       *lat = GPS.latitudeDegrees;
