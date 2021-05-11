@@ -107,7 +107,7 @@ void AsyncLED::breathe(int period) {
       //Calculate a new duty cycle
       int now = millis();
       float delta = (float)(now-start);
-      int dutyCycle = round(255.0 * ((sin((delta/period) * M_PI) + 1.0) / 2.0));
+      int dutyCycle = round(255.0 * ((1.0 - cos((delta/period) * M_PI)) / 2.0));
       ledcWrite(params->channel, dutyCycle);
       //Do it again in 30ms
       WAIT_MS(30);
