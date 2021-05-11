@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "esp_camera.h"
+#include "camera.h"
 #include "asyncLed.h"
 
 //Main
