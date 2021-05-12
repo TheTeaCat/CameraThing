@@ -1,2 +1,3 @@
 .pio
+.vscode
 main/secrets.h
