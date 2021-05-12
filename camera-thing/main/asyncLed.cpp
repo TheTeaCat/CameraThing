@@ -88,6 +88,66 @@ void AsyncLED::blink(int delay){
 // A breathing animation cycles on->off->on like blink but changes brightness by 
 // using PWM and a sine wave that loops every `period` milliseconds
 
+struct triangleAnimationParams {
+  int pin;
+  int channel;
+  int period;
+};
+
+triangleAnimationParams* currTriangleAnimationParams;
+
+void AsyncLED::triangle(int period) {
+  Serial.printf("[AsyncLED.triangle] [Pin %d] - Doin' a funki triangle with %d ms period\n", pin, period);
+
+  //Create animation params
+  currTriangleAnimationParams = new triangleAnimationParams{pin,channel,period};
+
+  //Declate animation loop used for this animation
+  auto triangleAnimationLoop = [](void* p) {
+    //Cast void pointer to animation params
+    triangleAnimationParams* params = (triangleAnimationParams*)p;
+
+    //Get vals from params struct
+    float period = (float)(params->period);
+
+    //Start our animation loop!
+    int start = millis();
+    for(;;) {
+      //Calculate a new duty cycle
+      int now = millis();
+      float delta = (float)((now-start)%params->period);
+      int dutyCycle = 0;
+      if(delta < period/2) {
+        dutyCycle = round(255.0 * (2 * (delta/period)));
+      } else {
+        dutyCycle = round(255.0 * (2 - (2 * (delta/period))));
+      }
+      ledcWrite(params->channel, dutyCycle);
+      //Do it again in 30ms
+      WAIT_MS(30);
+    }
+  };
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
+
+  //Create new animation task
+  xTaskCreatePinnedToCore(
+    triangleAnimationLoop, "triangleAnimationLoop", 10000, currTriangleAnimationParams, 1, &animationTask, 0
+  );
+
+  //Tell everyone we're animating now.
+  animating = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Breathe animation
+// A breathing animation cycles on->off->on like blink but changes brightness by 
+// using PWM and a sine wave that loops every `period` milliseconds
+
 struct breatheAnimationParams {
   int pin;
   int channel;
