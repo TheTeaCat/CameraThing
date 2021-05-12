@@ -19,9 +19,6 @@ type tweetEndpoint struct {
 
 //Constructor
 func newTweetEndpoint() (*tweetEndpoint, error) {
-	//Log req occurred
-	log.Println("Request @ /tweet!")
-
 	//Load authToken from env var
 	authToken, authTokenSet := os.LookupEnv("TWEET_AUTH_TOKEN")
 	if !authTokenSet && env == DEV {
@@ -39,6 +36,9 @@ func newTweetEndpoint() (*tweetEndpoint, error) {
 
 //Endpoint handler
 func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
+	//Log req occurred
+	log.Println("Request @ /tweet!")
+
 	//Check request for auth token
 	authToken := r.FormValue("auth")
 	if authToken != te.authToken {
