@@ -121,7 +121,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	tweetBody := ""
 	for i := 0; i < 5 && i < len(labels); i++ {
 		reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
-		tweetBody += "#" + reg.ReplaceAllString(strings.Title(labels[i].Label), "")
+		tweetBody += "#" + reg.ReplaceAllString(strings.Title(labels[i].Label), "") + " "
 	}
 	//If no labels were returned, use a default name
 	if len(labels) == 0 {
