@@ -127,7 +127,7 @@ void makeTweetRequest(int timeout, float lat, float lon, camera_fb_t* frameBuffe
     "Content-Length: " + String(frameBuffer->len) + "\r\n" + \
     + "\r\n" +
     + "--boundary\r\n" + \
-    + "Content-Disposition: form-data; name=\"image\"; filename=\"frameBuffer.png\"\r\n" + \
+    + "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n" + \
     + "\r\n";
   String reqTail = String("\r\n--boundary--\r\n\r\n");
   Serial.println("[makeTweetRequest] -------------------------Request Start");
@@ -143,10 +143,11 @@ void makeTweetRequest(int timeout, float lat, float lon, camera_fb_t* frameBuffe
 
   //////////////////////////////////////////////////////////////////////
   //Write image data
-  //Funky data time (I think I need to manually encode the framebuffer to a PNG 
-  //here, yikes...)
-  int written = wifiClient.write(frameBuffer->buf, frameBuffer->len);
-  Serial.printf("[%d bytes out of %d written from frame buffer]", written, frameBuffer->len);
+  uint8_t * jpgBuffer;
+  size_t jpgLen;
+  frame2jpg(frameBuffer, 80, &jpgBuffer, &jpgLen);
+  int written = wifiClient.write(jpgBuffer, jpgLen);
+  Serial.printf("[%d bytes out of %d written from frame buffer]", written, jpgLen);
 
   //////////////////////////////////////////////////////////////////////
   //Write request tail
