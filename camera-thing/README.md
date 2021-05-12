@@ -7,6 +7,7 @@ The IoT device!
 
 Wifi credentials must be set in `secrets.h`. An example can be found in `secrets.example.h`.
 
+The details of your tweeter service also need to be set in `secrets.h`.
 
 ## Debugging
 
