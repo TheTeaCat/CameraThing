@@ -37,7 +37,7 @@ func newTweetEndpoint() (*tweetEndpoint, error) {
 //Endpoint handler
 func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Log req occurred
-	log.Println("     [/tweet] - Request @ /tweet!")
+	log.Println("      [/tweet] - Request @ /tweet!")
 
 	//Check request for auth token
 	authToken := r.FormValue("auth")
@@ -92,7 +92,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
 	if err != nil {
-		log.Println("[400] [/tweet] - Couldn't read image file")
+		log.Printf("[400] [/tweet] - Couldn't read image file, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Failed to read image file")
