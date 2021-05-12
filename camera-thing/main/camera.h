@@ -4,7 +4,7 @@
 #include "esp_camera.h"
 
 //Utils
-void setupCamera();
+bool setupCamera();
 
 //Image getters
 bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen);

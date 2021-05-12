@@ -72,7 +72,13 @@ void setup() {
 
   //Setup camera (this may take a while if something has gone wrong)
   Serial.println("Setting up camera...");
-  setupCamera();
+  bool cameraSuccess = setupCamera();
+  if (!cameraSuccess) {
+    Serial.println("Failed to setup camera :(");
+    myLed.blink(100);
+    WAIT_MS(5000);
+    ESP.restart();
+  }
   Serial.println("Set up camera!");
 
   //Setup wifi (this may also take a while)

@@ -60,7 +60,7 @@ static camera_config_t camera_config = {
 // Setup
 
 //setupCamera prepares the camera for use.
-void setupCamera(){
+bool setupCamera(){
     //power up the camera if PWDN pin is defined
     if(CAM_PIN_PWDN != -1){
         pinMode(CAM_PIN_PWDN, OUTPUT);
@@ -69,10 +69,15 @@ void setupCamera(){
 
     //initialize the camera
     esp_err_t err = esp_camera_init(&camera_config);
+
+    //If camera setup fails, log & return false for fail
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Camera Init Failed");
-        return;
+        Serial.println("[setupCamera] - Camera setup failed :(");
+        return false;
     }
+
+    //Otherwise, true for success!
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
