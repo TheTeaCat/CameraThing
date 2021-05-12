@@ -83,7 +83,13 @@ void setup() {
 
   //Setup wifi (this may also take a while)
   Serial.println("Setting up WiFi...");
-  setupWifiManager();
+  bool wifiSuccess = setupWifiManager();
+  if (!wifiSuccess) {
+    Serial.println("Failed to WiFi connection :(");
+    myLed.blink(100);
+    WAIT_MS(5000);
+    ESP.restart();
+  }
   Serial.println("Set up WiFi!");
 
   Serial.println("Checking tweeter service is accessible");

@@ -15,15 +15,15 @@ String ip2str(IPAddress address) { // utility for printing IP addresses
     String(address[2]) + "." + String(address[3]);
 }
 
-void setupWifiManager() {
+bool setupWifiManager() {
   //Return immediately if the apropriate config vars aren't set
   #ifndef WIFISSID
     Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFISSID not set.");
-    return;
+    return false;
   #endif
   #ifndef WIFIPASSWORD
     Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFIPASSWORD not set.");
-    return;
+    return false;
   #endif
 
   #if defined(WIFISSID) && defined(WIFIPASSWORD)
@@ -51,14 +51,17 @@ void setupWifiManager() {
         }
       }
 
+      //If success, log it and return true
       if(success) {
         Serial.printf("[setupWifi] - WiFi successfully connected to SSID: '%s'\n", WIFISSID);
         Serial.printf("[setupWifi] - Device IP: %s\n", ip2str(WiFi.localIP()));
-        return;
+        return true;
       }
     }
 
+    //If we ran out of attempts, log and return false for fail
     Serial.printf("[setupWifi] - WiFi failed to connect to SSID: '%s'\n", WIFISSID);
+    return false;
   #endif
 }
 
