@@ -34,10 +34,10 @@ void setupWifiManager() {
       //Attempt to begin wifi conn
       WiFi.begin(WIFISSID, WIFIPASSWORD);
 
-      //We allow each attempt to run for 10 seconds
+      //We allow each attempt to run for 60 seconds
       bool success = false;
       Serial.print("[setupWifi] - Connecting...");
-      for(int trial = 0; trial < 10; trial++) {
+      for(int trial = 0; trial < 60; trial++) {
         if (WiFi.status() != WL_CONNECTED) {
           Serial.print(".");
           WAIT_MS(1000);
@@ -46,7 +46,7 @@ void setupWifiManager() {
           success = true;
           break;
         }
-        if(trial == 9) {
+        if(trial == 29) {
           Serial.print(" failed! :(\n");
         }
       }
