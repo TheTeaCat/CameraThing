@@ -19,6 +19,9 @@ type tweetEndpoint struct {
 
 //Constructor
 func newTweetEndpoint() (*tweetEndpoint, error) {
+	//Log req occurred
+	log.Println("Request @ /tweet!")
+
 	//Load authToken from env var
 	authToken, authTokenSet := os.LookupEnv("TWEET_AUTH_TOKEN")
 	if !authTokenSet && env == DEV {
@@ -129,6 +132,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Respond
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{

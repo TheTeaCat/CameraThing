@@ -52,6 +52,13 @@ func main() {
 
 	//Create endpoints
 	log.Println("Creating endpoint instances...")
+	myHealthEndpoint, err := newHealthEndpoint()
+	if err != nil {
+		log.Fatalf(
+			"Couldn't create tweetEndpoint instance, err: %[1]v",
+			err.Error(),
+		)
+	}
 	myTweetEndpoint, err := newTweetEndpoint()
 	if err != nil {
 		log.Fatalf(
@@ -62,6 +69,7 @@ func main() {
 
 	//Attach endpoint handlers
 	log.Println("Attaching endpoint handlers...")
+	http.HandleFunc("/health", myHealthEndpoint.handle)
 	http.HandleFunc("/tweet", myTweetEndpoint.handle)
 
 	//Determine port to use from env vars (default to 8080)
