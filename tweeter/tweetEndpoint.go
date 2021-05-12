@@ -37,11 +37,12 @@ func newTweetEndpoint() (*tweetEndpoint, error) {
 //Endpoint handler
 func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Log req occurred
-	log.Println("Request @ /tweet!")
+	log.Println("     [/tweet] - Request @ /tweet!")
 
 	//Check request for auth token
 	authToken := r.FormValue("auth")
 	if authToken != te.authToken {
+		log.Println("[401] [/tweet] - No auth token supplied")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Invalid auth token")
@@ -52,6 +53,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	latStr := r.FormValue("lat")
 	lat, err := strconv.ParseFloat(latStr, 64)
 	if latStr == "" || err != nil {
+		log.Println("[400] [/tweet] - No latitude supplied")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		if latStr == "" {
@@ -61,6 +63,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	} else if lat < -180 || lat > 180 {
+		log.Println("[400] [/tweet] - Latitude out of range")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Latitude out of range (min -180, max 180)")
@@ -69,6 +72,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	longStr := r.FormValue("long")
 	long, err := strconv.ParseFloat(longStr, 64)
 	if longStr == "" || err != nil {
+		log.Println("[400] [/tweet] - No longitude supplied")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		if latStr == "" {
@@ -78,6 +82,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	} else if long < -90 || long > 90 {
+		log.Println("[400] [/tweet] - Longitude out of range")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Longitude out of range (min -90, max 90)")
@@ -87,6 +92,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
 	if err != nil {
+		log.Println("[400] [/tweet] - Couldn't read image file")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Failed to read image file")
@@ -102,9 +108,9 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Get image labels
 	labels, err := myRecogniser.recognise(imageBytes)
 	if err != nil {
-		log.Printf("Failed to recognise image, err: %[1]v", err.Error())
+		log.Printf("[500] [/tweet] - Image recognition failed, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to recognise image")
 		return
 	}
@@ -125,7 +131,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Make tweet
 	err = myTweeter.tweetWithImage(tweetBody, imageBytes)
 	if err != nil {
-		log.Printf("Failed to tweet image, err: %[1]v", err.Error())
+		log.Printf("[500] [/tweet] - Failed to tweet image, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to tweet image")
@@ -133,6 +139,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Respond
+	log.Printf("[201] [/tweet] - Successfully tweeted: %[1]v", strings.ReplaceAll(tweetBody, "\n", ""))
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{
