@@ -45,12 +45,12 @@ static camera_config_t camera_config = {
     .pin_pclk = CAM_PIN_PCLK,
 
     //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
-    .xclk_freq_hz = 20000000,
+    .xclk_freq_hz = 10000000,
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
-    .pixel_format = PIXFORMAT_RGB888,//YUV422,GRAYSCALE,RGB565,JPEG
-    .frame_size = FRAMESIZE_QQVGA,//QQVGA-QXGA Do not use sizes above QVGA when not JPEG
+    .pixel_format = PIXFORMAT_GRAYSCALE,//YUV422,GRAYSCALE,RGB565,JPEG
+    .frame_size = FRAMESIZE_QVGA,//QQVGA-QXGA Do not use sizes above QVGA when not JPEG
 
     .jpeg_quality = 12, //0-63 lower number means higher quality
     .fb_count = 1 //if more than one, i2s runs in continuous mode. Use only with JPEG
@@ -94,23 +94,20 @@ void takePicture(){
 //frameBufferToSerial takes a frame buffer and outputs its information to 
 //serial, including the image formatted as ASCII characters.
 void frameBufferToSerial(camera_fb_t* fb) {
-    //Display the image metadata first
+    //Display the frame buffer in serial using an ASCII scale
+    String scale = " .:-=+*#%@";
+    int len = fb->len;
+    for(int i = 0; i < len; i++) {
+      Serial.print(scale[*(fb->buf+i)/26]);
+      Serial.print(scale[*(fb->buf+i)/26]);
+      if(i % (fb->width) == (fb->width)-1) {
+        Serial.print("\n");
+      }
+    }
+
+    //Then display the image metadata
     Serial.printf(
       "Width: %d, Height: %d, Len: %d, Format: %d\n", 
       fb->width, fb->height, fb->len, fb->format
     );
-
-    //Then construct an ASCII string from the buffer
-    String data = "";
-    String scale = " .:-=+*#%@";
-    for(int i = 0; i < fb->len; i++) {
-      uint8_t v = *(fb->buf+i);
-      data += scale[v/26];
-      if(i % (fb->width*3) == 0) {
-        data += "\n";
-      }
-    }
-
-    //And print it to serial
-    Serial.println(data);
 }
