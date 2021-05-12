@@ -106,28 +106,26 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	imageBytes := imageBuffer.Bytes()
 
 	//Get image labels
-	// labels, err := myRecogniser.recognise(imageBytes)
-	// if err != nil {
-	// 	log.Printf("[500] [/tweet] - Image recognition failed, err: %[1]v", err.Error())
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	json.NewEncoder(w).Encode("Failed to recognise image")
-	// 	return
-	// }
+	labels, err := myRecogniser.recognise(imageBytes)
+	if err != nil {
+		log.Printf("[500] [/tweet] - Image recognition failed, err: %[1]v", err.Error())
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Failed to recognise image")
+		return
+	}
 
-	// /*Construct a tweetBody consisting of an image title from up to the first
-	// three labels*/
-	// tweetBody := ""
-	// for i := 0; i < 5 && i < len(labels); i++ {
-	// 	reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
-	// 	tweetBody += reg.ReplaceAllString(strings.Title(labels[i].Label), "") + "? "
-	// }
-	// //If no labels were returned, use a default name
-	// if len(labels) == 0 {
-	// 	tweetBody = "Untitled"
-	// }
+	//Construct a tweetBody of up to five labels followed by question marks
+	tweetBody := ""
+	for i := 0; i < 5 && i < len(labels); i++ {
+		tweetBody += strings.Title(labels[i].Label) + "? "
+	}
+	//If no labels were returned, say we've got no idea what it is
+	if len(labels) == 0 {
+		tweetBody = "I have no idea. "
+	}
 	//Add the location to the tweet
-	tweetBody := fmt.Sprintf("(%.5f,%.5f)", lat, long)
+	tweetBody += fmt.Sprintf("(%.5f,%.5f)", lat, long)
 
 	//Make tweet
 	err = myTweeter.tweetWithImage(tweetBody, imageBytes)
