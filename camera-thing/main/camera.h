@@ -7,4 +7,4 @@
 void setupCamera();
 
 //Image getters
-void getJPEG(uint8_t** jpgBuffer, size_t* jpgLen);
+bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen);

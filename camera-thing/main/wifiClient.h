@@ -7,4 +7,4 @@ void setupWifiManager();
 
 //Utils
 void checkTweeterAccessible(int timeout);
-void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen);
+bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen);

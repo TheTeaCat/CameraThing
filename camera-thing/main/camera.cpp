@@ -79,23 +79,27 @@ void setupCamera(){
 // Framebuffer getter & setter
 
 //takePicture gets an image from the camera's frame buffer and processes it.
-void getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
+bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
   //acquire a frame
   camera_fb_t* frameBuffer = esp_camera_fb_get();
 
-  //If it failed, log.
+  //If it failed, log & return false for fail
   if (!frameBuffer) {
     Serial.println("[getFrameBuffer] - Camera Capture Failed :(");
+    return false;
   }
 
   //Compress frameBuffer to JPEG
   bool converted = frame2jpg(frameBuffer, 80, jpgBuffer, jpgLen);
-  if (!converted) {
-    Serial.println("[getFrameBuffer] - JPEG conversion Failed :(");
-  }
-
   //return the frame buffer back to the driver for reuse
   esp_camera_fb_return(frameBuffer);
+
+  //Return false and log if failed to compress, otherwise true
+  if (!converted) {
+    Serial.println("[getFrameBuffer] - JPEG conversion Failed :(");
+    return false;
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

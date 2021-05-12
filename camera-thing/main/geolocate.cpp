@@ -29,14 +29,15 @@ void setupGPS() {
 // Uncomment this to send the last NMEA from the GPS to serial
 // # define PRINTLASTNMEA
 
-void geolocate(float* lat, float* lon, int timeout) {
+bool geolocate(float* lat, float* lon, int timeout) {
   int started = millis();
 
   for(;;) {
     //Check timeout first
     int deltaT = millis()-started;
     if (deltaT > timeout) {
-      return;
+      //Return false for fail if we timeout
+      return false;
     }
 
     //Read from GPS
@@ -55,14 +56,16 @@ void geolocate(float* lat, float* lon, int timeout) {
         continue;
       }
 
-      //Otherwise print success if debugging...
+      //Otherwise print success...
       Serial.printf("[Geolocate] - Successfully parsed NMEA, deltaT: %d ms\n", deltaT);
       Serial.printf("[Geolocate] - lat: %f, long: %f\n", GPS.latitudeDegrees, GPS.longitudeDegrees);
 
       //...and set the lat and lon in the pointers given
       *lat = GPS.latitudeDegrees;
       *lon = GPS.longitudeDegrees;
-      return;
+
+      //then return true for success
+      return true;
     };
   }
 }

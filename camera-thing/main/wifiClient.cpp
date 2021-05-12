@@ -106,19 +106,16 @@ void checkTweeterAccessible(int timeout) {
   wifiClient.stop();
 }
 
-void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
-  //////////////////////////////////////////////////////////////////////
+bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
   //Connect to tweeter
   Serial.printf("[makeTweetRequest] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
   if (!wifiClient.connect(TWEETER_HOST, TWEETER_PORT)) {
     Serial.println("[makeTweetRequest] - Failed to connect :(");
-    return;
+    return false;
   }
 
-  //////////////////////////////////////////////////////////////////////
   //Write request body
   Serial.println("[makeTweetRequest] - Writing request...");
-
   wifiClient.print("POST /tweet?auth=" TWEETER_AUTH_TOKEN "&lat=");
   wifiClient.printf("%02.5f", lat);
   wifiClient.print("&long=");
@@ -127,26 +124,25 @@ void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
   wifiClient.print("Host: " TWEETER_HOST "\r\n");
   wifiClient.print("Content-Type: multipart/form-data;boundary=\"boundary\"\r\n");
   wifiClient.printf("Content-Length: %d\r\n", (*jpgLen)+1000); //This is uh... good enough
-  wifiClient.print("Connection: close\r\n");
-  wifiClient.print("\r\n"
-                   "--boundary\r\n"
+  wifiClient.print("Connection: close\r\n\r\n");
+  wifiClient.print("--boundary\r\n"
                    "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n"
                    "\r\n");
   int written = wifiClient.write(*jpgBuffer, *jpgLen);
   wifiClient.print("\r\n--boundary--\r\n\r\n");
 
+  //Display JPEG bytes written and success in serial
   Serial.printf("[makeTweetRequest] - %d bytes out of %d written from JPEG\n", written, *jpgLen);
-  Serial.println("[makeTweetRequest] - Successfully written request!");
+  Serial.println("[makeTweetRequest] - Finished writing request");
 
-  //////////////////////////////////////////////////////////////////////
-  //Await response with timeout
+  //Await response from server with timeout
   Serial.printf("[makeTweetRequest] - Awaiting response (read timeout %d ms)...", timeout);
   int startTime = millis();
   while(wifiClient.available() == 0) {
     if(millis() - startTime > timeout) {
       Serial.println(" timed out :(");
       wifiClient.stop();
-      return;
+      return false;
     }
     WAIT_MS(1000);
     Serial.print(".");
@@ -156,11 +152,25 @@ void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
   //////////////////////////////////////////////////////////////////////
   //Output response
   Serial.println("[makeTweetRequest] -------------------------Response Start");
+
+  bool success = false;
+
+  //While there are bytes left to print...
   while(wifiClient.available()) {
-    Serial.println(wifiClient.readStringUntil('\r'));
+    //Get a line...
+    String line = wifiClient.readStringUntil('\r');
+    //Print it to serial...
+    Serial.println(line);
+    //Then check if it states we succeeded...
+    if (line == "HTTP/1.1 201 Created") {
+      success = true;
+    }
   }
+
   Serial.println("[makeTweetRequest] -------------------------Response End");
 
   //Close wifi client
   wifiClient.stop();
+
+  return success;
 }

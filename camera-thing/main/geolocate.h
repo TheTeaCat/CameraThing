@@ -8,4 +8,4 @@
 void setupGPS();
 
 //Utils
-void geolocate(float* lat, float* lon, int timeout);
+bool geolocate(float* lat, float* lon, int timeout);

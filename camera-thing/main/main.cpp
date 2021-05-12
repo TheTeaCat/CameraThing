@@ -110,10 +110,10 @@ void loop() {
       //Get a JPEG from the camera
       uint8_t *jpgBuffer;
       size_t jpgLen;
-      getJPEG(&jpgBuffer, &jpgLen);
+      bool gotJPEG = getJPEG(&jpgBuffer, &jpgLen);
 
       //If we fail to get a frame buffer, signal an err and return.
-      if (jpgLen == 0) {
+      if (!gotJPEG || jpgLen == 0) {
         Serial.println("[Loop] - Failed to get JPEG :(");
         //Blink fast to signal something bad has happened that needs debugging
         myLed.blink(100);
@@ -142,7 +142,7 @@ void loop() {
 
       //Get geolocation with geolocate() function
       float lat; float lon;
-      geolocate(&lat, &lon, 1000);
+      bool gotGeolocation = geolocate(&lat, &lon, 1000);
 
       //If we're mocking delays, delay to pretend it takes a while to get a 
       //geolocation from the GPS featherwing
@@ -150,6 +150,16 @@ void loop() {
         Serial.printf("[MockDelay] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
         WAIT_MS(MOCKDELAY);
       #endif
+
+      //If there is some err getting the geolocation data, signal an err and 
+      //return.
+      if(!gotGeolocation) {
+        //Blink fast to signal something bad has happened that needs debugging
+        myLed.blink(100);
+        WAIT_MS(2000);
+        myLed.off();
+        return;
+      }
 
       //Output geolocation to serial
       Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
@@ -163,7 +173,24 @@ void loop() {
       myLed.throb(900,100);
 
       //Upload the information to the tweet service
-      makeTweetRequest(30000,lat,lon,&jpgBuffer,&jpgLen);
+      bool tweetSuccess = makeTweetRequest(30000,lat,lon,&jpgBuffer,&jpgLen);
+
+      //If we're mocking delays, delay to pretend it takes a while to send the
+      //data to the tweeter service
+      #ifdef MOCKDELAY
+        Serial.printf("[MockDelay] - Mocking a slower tweet response by waiting %d ms...\n", MOCKDELAY);
+        WAIT_MS(MOCKDELAY);
+      #endif
+
+      //If there is some err getting the data to the tweeter, signal an err and 
+      //return.
+      if(!tweetSuccess) {
+        //Blink fast to signal something bad has happened that needs debugging
+        myLed.blink(100);
+        WAIT_MS(2000);
+        myLed.off();
+        return;
+      }
 
       //Turn the LED off now the upload is done
       myLed.off();
