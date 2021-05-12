@@ -46,7 +46,7 @@ void setupWifiManager() {
           success = true;
           break;
         }
-        if(trial == 29) {
+        if(trial == 59) {
           Serial.print(" failed! :(\n");
         }
       }
@@ -71,8 +71,8 @@ void checkTweeterAccessible(int timeout) {
   }
 
   //Construct request
-  String req = String("GET /health HTTP/1.1\r\n") + \
-    "Host: " + TWEETER_HOST + "\r\n\r\n";
+  char *req = "GET /health HTTP/1.1\r\n"
+              "Host: " TWEETER_HOST "\r\n\r\n";
   Serial.println("[checkTweeterAccessible] -------------------------Request Start");
   Serial.print(req);
   Serial.println("[checkTweeterAccessible] -------------------------Request End");
@@ -106,7 +106,7 @@ void checkTweeterAccessible(int timeout) {
   wifiClient.stop();
 }
 
-void makeTweetRequest(int timeout, float lat, float lon, camera_fb_t* frameBuffer) {
+void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
   //////////////////////////////////////////////////////////////////////
   //Connect to tweeter
   Serial.printf("[makeTweetRequest] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
@@ -116,44 +116,25 @@ void makeTweetRequest(int timeout, float lat, float lon, camera_fb_t* frameBuffe
   }
 
   //////////////////////////////////////////////////////////////////////
-  //Construct request head and tail (before and after frameBuffer data)
-  String reqHead = String("POST /tweet") + \
-    "?auth=" + TWEETER_AUTH_TOKEN + \
-    "&lat="+String(lat,6) + \
-    "&long="+String(lon,6) + \
-    " HTTP/1.1\r\n" + \
-    "Host: " + TWEETER_HOST + "\r\n" + \
-    "Content-Type: multipart/form-data;boundary=\"boundary\"\r\n" + \
-    "Content-Length: " + String(frameBuffer->len) + "\r\n" + \
-    + "\r\n" +
-    + "--boundary\r\n" + \
-    + "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n" + \
-    + "\r\n";
-  String reqTail = String("\r\n--boundary--\r\n\r\n");
-  Serial.println("[makeTweetRequest] -------------------------Request Start");
-  Serial.print(reqHead + "[FRAMEBUFFER DATA]" + reqTail);
-  Serial.println("[makeTweetRequest] -------------------------Request End");
+  //Write request body
+  Serial.println("[makeTweetRequest] - Writing request...");
 
-  //////////////////////////////////////////////////////////////////////
-  //Write request head
-  Serial.println("[makeTweetRequest] - Making request...");
-  wifiClient.print(reqHead);
-  Serial.println("[makeTweetRequest] -------------------------Request Start (actual)");
-  Serial.print(reqHead);
+  wifiClient.print("POST /tweet?auth=" TWEETER_AUTH_TOKEN "&lat=");
+  wifiClient.printf("%02.5f", lat);
+  wifiClient.print("&long=");
+  wifiClient.printf("%02.5f", lon);
+  wifiClient.print(" HTTP/1.1\r\n");
+  wifiClient.print("Host: " TWEETER_HOST "\r\n");
+  wifiClient.print("Content-Type: multipart/form-data;boundary=\"boundary\"\r\n");
+  wifiClient.printf("Content-Length: %d\r\n", jpgLen); //This is uh... good enough
+  wifiClient.print("\r\n"
+                   "--boundary\r\n"
+                   "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n"
+                   "\r\n");
+  int written = wifiClient.write(*jpgBuffer, *jpgLen);
+  wifiClient.print("\r\n--boundary--\r\n\r\n");
 
-  //////////////////////////////////////////////////////////////////////
-  //Write image data
-  uint8_t * jpgBuffer;
-  size_t jpgLen;
-  frame2jpg(frameBuffer, 80, &jpgBuffer, &jpgLen);
-  int written = wifiClient.write(jpgBuffer, jpgLen);
-  Serial.printf("[%d bytes out of %d written from frame buffer]", written, jpgLen);
-
-  //////////////////////////////////////////////////////////////////////
-  //Write request tail
-  wifiClient.print(reqTail);
-  Serial.print(reqTail);
-  Serial.println("[makeTweetRequest] -------------------------Request End (actual)");
+  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from JPEG\n", written, jpgLen);
   Serial.println("[makeTweetRequest] - Successfully written request!");
 
   //////////////////////////////////////////////////////////////////////

@@ -107,16 +107,17 @@ void loop() {
       //Turn on the LED while we get a frame buffer from the camera
       myLed.on();
 
-      //Get the frame buffer
-      //@todo: refactor to return JPEG data?
-      camera_fb_t* frameBuffer = getFrameBuffer();
+      //Get a JPEG from the camera
+      uint8_t * jpgBuffer;
+      size_t jpgLen;
+      getJPEG(&jpgBuffer, &jpgLen);
 
       //If we fail to get a frame buffer, signal an err and return.
-      if (!frameBuffer) {
-        Serial.println("[Loop] - Failed to get frame buffer :(");
+      if (jpgLen == 0) {
+        Serial.println("[Loop] - Failed to get JPEG :(");
         //Blink fast to signal something bad has happened that needs debugging
         myLed.blink(100);
-        WAIT_MS(5000);
+        WAIT_MS(2000);
         myLed.off();
         return;
       }
@@ -159,21 +160,9 @@ void loop() {
       myLed.throb(900,100);
 
       //Upload the information to the tweet service
-      makeTweetRequest(5000,lat,lon,frameBuffer);
+      makeTweetRequest(30000,lat,lon,&jpgBuffer,&jpgLen);
 
       //Turn the LED off now the upload is done
-      myLed.off();
-
-      //////////////////////////////////////////////////////////////////////
-      //Returning the frameBuffer
-      //We have to return the frameBuffer to the camera so it can start writing
-      //to it again.
-      //Turn on the LED while we return the frame buffer to the camera
-      myLed.on();
-
-      returnFrameBuffer(frameBuffer);
-
-      //Turn the LED off now we've returned the frameBuffer
       myLed.off();
 
       //////////////////////////////////////////////////////////////////////

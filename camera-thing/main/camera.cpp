@@ -49,7 +49,7 @@ static camera_config_t camera_config = {
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
-    .pixel_format = PIXFORMAT_GRAYSCALE,//YUV422,GRAYSCALE,RGB565,JPEG
+    .pixel_format = PIXFORMAT_YUV422,//YUV422,GRAYSCALE,RGB565,JPEG
     .frame_size = FRAMESIZE_QQVGA,//QQVGA-QXGA Do not use sizes above QVGA when not JPEG
 
     .jpeg_quality = 12, //0-63 lower number means higher quality
@@ -57,7 +57,7 @@ static camera_config_t camera_config = {
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// Utils
+// Setup
 
 //setupCamera prepares the camera for use.
 void setupCamera(){
@@ -75,24 +75,28 @@ void setupCamera(){
     }
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// Framebuffer getter & setter
+
 //takePicture gets an image from the camera's frame buffer and processes it.
-camera_fb_t* getFrameBuffer(){
+void getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
   //acquire a frame
-  camera_fb_t* fb = esp_camera_fb_get();
+  camera_fb_t* frameBuffer = esp_camera_fb_get();
 
   //If it failed, log.
-  if (!fb) {
+  if (!frameBuffer) {
       Serial.println("[getFrameBuffer] - Camera Capture Failed :(");
   }
 
-  //Always return fb
-  return fb;
+  //Compress frameBuffer to JPEG
+  frame2jpg(frameBuffer, 80, jpgBuffer, jpgLen);
+
+  //return the frame buffer back to the driver for reuse
+  esp_camera_fb_return(frameBuffer);
 }
 
-//return the frame buffer back to the driver for reuse. Just a simple wrapper.
-void returnFrameBuffer(camera_fb_t* fb) {
-  esp_camera_fb_return(fb);
-}
+/////////////////////////////////////////////////////////////////////////////
+// Debug utils
 
 //frameBufferToSerial takes a frame buffer and outputs its information to 
 //serial, including the image formatted as ASCII characters.
