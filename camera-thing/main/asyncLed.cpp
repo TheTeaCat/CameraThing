@@ -52,6 +52,12 @@ blinkAnimationParams* currBlinkAnimationParams;
 void AsyncLED::blink(int delay){
   Serial.printf("[AsyncLED.blink] [Pin %d] - Blinking with %d ms delay\n", pin, delay);
 
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
+
   //Create animation params
   currBlinkAnimationParams = new blinkAnimationParams{pin,channel,delay};
 
@@ -67,12 +73,6 @@ void AsyncLED::blink(int delay){
       WAIT_MS(params->delay);
     }
   };
-
-  //If we're already animating, kill the current animation before starting a new 
-  //one (we can't have two going at once!)
-  if(animating) {
-    killAnimation();
-  }
 
   //Create new animation task
   xTaskCreatePinnedToCore(
@@ -98,6 +98,12 @@ triangleAnimationParams* currTriangleAnimationParams;
 
 void AsyncLED::triangle(int period) {
   Serial.printf("[AsyncLED.triangle] [Pin %d] - Doin' a funki triangle with %d ms period\n", pin, period);
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
 
   //Create animation params
   currTriangleAnimationParams = new triangleAnimationParams{pin,channel,period};
@@ -128,12 +134,6 @@ void AsyncLED::triangle(int period) {
     }
   };
 
-  //If we're already animating, kill the current animation before starting a new 
-  //one (we can't have two going at once!)
-  if(animating) {
-    killAnimation();
-  }
-
   //Create new animation task
   xTaskCreatePinnedToCore(
     triangleAnimationLoop, "triangleAnimationLoop", 10000, currTriangleAnimationParams, 1, &animationTask, 0
@@ -159,6 +159,12 @@ breatheAnimationParams* currBreatheAnimationParams;
 void AsyncLED::breathe(int period) {
   Serial.printf("[AsyncLED.breathe] [Pin %d] - Breathing with %d ms period\n", pin, period);
 
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
+
   //Create animation params
   currBreatheAnimationParams = new breatheAnimationParams{pin,channel,period};
 
@@ -182,12 +188,6 @@ void AsyncLED::breathe(int period) {
       WAIT_MS(30);
     }
   };
-
-  //If we're already animating, kill the current animation before starting a new 
-  //one (we can't have two going at once!)
-  if(animating) {
-    killAnimation();
-  }
 
   //Create new animation task
   xTaskCreatePinnedToCore(
@@ -217,6 +217,12 @@ throbAnimationParams* currThrobAnimationParams;
 
 void AsyncLED::throb(int attack, int decay) {
   Serial.printf("[AsyncLED.throb] [Pin %d] - Throbbing with %d ms attack and %d ms decay\n", pin, attack, decay);
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
 
   //Create animation params
   currThrobAnimationParams = new throbAnimationParams{pin,channel,attack,decay};
@@ -248,12 +254,6 @@ void AsyncLED::throb(int attack, int decay) {
       WAIT_MS(30);
     }
   };
-
-  //If we're already animating, kill the current animation before starting a new 
-  //one (we can't have two going at once!)
-  if(animating) {
-    killAnimation();
-  }
 
   //Create new animation task
   xTaskCreatePinnedToCore(
