@@ -15,7 +15,7 @@ String ip2str(IPAddress address) { // utility for printing IP addresses
     String(address[2]) + "." + String(address[3]);
 }
 
-bool setupWifiManager() {
+bool setupWifiManager(int maxTrials, int maxAttempts) {
   //Return immediately if the apropriate config vars aren't set
   #ifndef WIFISSID
     Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFISSID not set.");
@@ -28,7 +28,7 @@ bool setupWifiManager() {
 
   #if defined(WIFISSID) && defined(WIFIPASSWORD)
     //We try 5 times to connect to WiFi before giving up
-    for(int attempt = 0; attempt < 10; attempt++) {
+    for(int attempt = 0; attempt < maxAttempts; attempt++) {
       Serial.printf("[setupWifi] - Trying to connect to '%s'\n", WIFISSID);
       
       //Attempt to begin wifi conn
@@ -37,7 +37,7 @@ bool setupWifiManager() {
       //We allow each attempt to run for 60 seconds
       bool success = false;
       Serial.print("[setupWifi] - Connecting...");
-      for(int trial = 0; trial < 60; trial++) {
+      for(int trial = 0; trial < maxTrials; trial++) {
         if (WiFi.status() != WL_CONNECTED) {
           Serial.print(".");
           WAIT_MS(1000);
@@ -114,7 +114,7 @@ bool checkTweeterAccessible(int timeout) {
     //Then check if it states 200 OK...
     if (line == "HTTP/1.1 200 OK") {
       success = true;
-  }
+    }
   }
   Serial.println("[makeTweetRequest] -------------------------Response End");
 

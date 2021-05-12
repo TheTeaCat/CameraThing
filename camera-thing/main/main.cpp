@@ -75,7 +75,7 @@ void setup() {
 
   //Setup wifi (this may also take a while)
   Serial.println("Setting up WiFi...");
-  bool wifiSuccess = setupWifiManager();
+  bool wifiSuccess = setupWifiManager(60, 10);
   if (!wifiSuccess) {
     Serial.println("Failed to WiFi connection :(");
     myLed.blink(100);

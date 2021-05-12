@@ -3,7 +3,7 @@
 // the tweeter service
 
 //Setup
-bool setupWifiManager();
+bool setupWifiManager(int maxTrials, int maxAttempts);
 
 //Utils
 bool checkTweeterAccessible(int timeout);
