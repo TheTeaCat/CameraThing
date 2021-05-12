@@ -72,6 +72,9 @@ void setup() {
   setupWifiManager();
   Serial.println("Set up WiFi!");
 
+  Serial.println("Checking tweeter service is accessible");
+  checkTweeterAccessible(60000);
+
   //If we're mocking delays, add 5s to the startup time.
   #ifdef MOCKDELAY
     Serial.printf("[MockDelay] - Mocking a longer setup time by waiting %d ms...\n", MOCKDELAY);

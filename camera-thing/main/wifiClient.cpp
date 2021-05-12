@@ -2,11 +2,11 @@
 // Config and utils for connecting to a wifi connection to test sending data to
 // the tweeter service
 
-#include <WiFiClientSecure.h>
+#include <WiFi.h>
 #include "utils.h"
 #include "secrets.h"
 
-WiFiClientSecure wifiClient; // the TLS web client
+WiFiClient wifiClient; // the TLS web client
 
 String ip2str(IPAddress address) { // utility for printing IP addresses
   return
@@ -29,7 +29,7 @@ void setupWifiManager() {
     //We try 5 times to connect to WiFi before giving up
     for(int attempt = 0; attempt < 10; attempt++) {
       Serial.printf("[setupWifi] - Trying to connect to '%s'\n", WIFISSID);
-
+      
       //Attempt to begin wifi conn
       WiFi.begin(WIFISSID, WIFIPASSWORD);
 
@@ -59,4 +59,47 @@ void setupWifiManager() {
 
     Serial.printf("[setupWifi] - WiFi failed to connect to SSID: '%s'\n", WIFISSID);
   #endif
+}
+
+void checkTweeterAccessible(int timeout) {
+  //Connect to tweeter
+  Serial.printf("[checkTweeterAccessible] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
+  if (!wifiClient.connect(TWEETER_HOST, TWEETER_PORT)) {
+    Serial.println("[checkTweeterAccessible] - Failed to connect :(");
+    return;
+  }
+
+  //Construct request
+  String req = String("GET / HTTP/1.1\r\n") + \
+    "Host: " + TWEETER_HOST + "\r\n\r\n";
+  Serial.println("[checkTweeterAccessible] -------------------------Request Start");
+  Serial.print(req);
+  Serial.println("[checkTweeterAccessible] -------------------------Request End");
+
+  //Make request to the tweeter's /health endpoint
+  Serial.printf("[checkTweeterAccessible] - Making request (timeout %d ms)...", timeout);
+  wifiClient.print(req);
+
+  //Handle timeout
+  int startTime = millis();
+  while(wifiClient.available() == 0) {
+    if(millis() - startTime > timeout) {
+      Serial.println(" timed out :(");
+      wifiClient.stop();
+      return;
+    }
+    WAIT_MS(1000);
+    Serial.print(".");
+  }
+  Serial.println(" success!");
+
+  //Output response
+  Serial.println("[checkTweeterAccessible] -------------------------Response Start");
+  while(wifiClient.available()) {
+    Serial.println(wifiClient.readStringUntil('\r'));
+  }
+  Serial.println("[checkTweeterAccessible] -------------------------Response End");
+
+  //Close wifi client
+  wifiClient.stop();
 }
