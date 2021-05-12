@@ -72,7 +72,8 @@ void checkTweeterAccessible(int timeout) {
 
   //Construct request
   char *req = "GET /health HTTP/1.1\r\n"
-              "Host: " TWEETER_HOST "\r\n\r\n";
+              "Host: " TWEETER_HOST "\r\n"
+              "Connection: close\r\n\r\n";
   Serial.println("[checkTweeterAccessible] -------------------------Request Start");
   Serial.print(req);
   Serial.println("[checkTweeterAccessible] -------------------------Request End");
@@ -116,10 +117,9 @@ bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
 
   //Write request body
   Serial.println("[makeTweetRequest] - Writing request...");
-  wifiClient.print("POST /tweet?auth=" TWEETER_AUTH_TOKEN "&lat=");
-  wifiClient.printf("%02.5f", lat);
-  wifiClient.print("&long=");
-  wifiClient.printf("%02.5f", lon);
+  wifiClient.printf("POST /tweet?auth=" TWEETER_AUTH_TOKEN 
+                    "&lat=%02.5f"
+                    "&long=%02.5f", lat, lon);
   wifiClient.print(" HTTP/1.1\r\n");
   wifiClient.print("Host: " TWEETER_HOST "\r\n");
   wifiClient.print("Content-Type: multipart/form-data;boundary=\"boundary\"\r\n");
@@ -149,12 +149,10 @@ bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
   }
   Serial.println(" success!");
 
-  //////////////////////////////////////////////////////////////////////
-  //Output response
+  //Get response
   Serial.println("[makeTweetRequest] -------------------------Response Start");
-
+  //Will be set to true if the response states a tweet was created
   bool success = false;
-
   //While there are bytes left to print...
   while(wifiClient.available()) {
     //Get a line...
@@ -166,11 +164,11 @@ bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
       success = true;
     }
   }
-
   Serial.println("[makeTweetRequest] -------------------------Response End");
 
   //Close wifi client
   wifiClient.stop();
 
+  //Return the success flag!
   return success;
 }
