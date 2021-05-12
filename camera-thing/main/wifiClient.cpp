@@ -126,7 +126,8 @@ void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
   wifiClient.print(" HTTP/1.1\r\n");
   wifiClient.print("Host: " TWEETER_HOST "\r\n");
   wifiClient.print("Content-Type: multipart/form-data;boundary=\"boundary\"\r\n");
-  wifiClient.printf("Content-Length: %d\r\n", jpgLen); //This is uh... good enough
+  wifiClient.printf("Content-Length: %d\r\n", (*jpgLen)+1000); //This is uh... good enough
+  wifiClient.print("Connection: close\r\n");
   wifiClient.print("\r\n"
                    "--boundary\r\n"
                    "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n"
@@ -134,7 +135,7 @@ void makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
   int written = wifiClient.write(*jpgBuffer, *jpgLen);
   wifiClient.print("\r\n--boundary--\r\n\r\n");
 
-  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from JPEG\n", written, jpgLen);
+  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from JPEG\n", written, *jpgLen);
   Serial.println("[makeTweetRequest] - Successfully written request!");
 
   //////////////////////////////////////////////////////////////////////
