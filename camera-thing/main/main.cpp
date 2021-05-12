@@ -108,7 +108,7 @@ void loop() {
       myLed.on();
 
       //Get a JPEG from the camera
-      uint8_t * jpgBuffer;
+      uint8_t *jpgBuffer;
       size_t jpgLen;
       getJPEG(&jpgBuffer, &jpgLen);
 
@@ -164,6 +164,12 @@ void loop() {
 
       //Turn the LED off now the upload is done
       myLed.off();
+
+      //////////////////////////////////////////////////////////////////////
+      //Cleanup
+      //Delete the jpgBuffer now we're done with it so we don't have a memory 
+      //leak!
+      delete jpgBuffer;
 
       //////////////////////////////////////////////////////////////////////
       //Buttondown warning     
