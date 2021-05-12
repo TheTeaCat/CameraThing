@@ -5,5 +5,10 @@
 
 //Utils
 void setupCamera();
-void takePicture();
+
+//Framebuffer accessors
+camera_fb_t* getFrameBuffer();
+void returnFrameBuffer(camera_fb_t* fb);
+
+//Framebuffer renderer for debugging
 void frameBufferToSerial(camera_fb_t* fb);

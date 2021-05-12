@@ -7,3 +7,4 @@ void setupWifiManager();
 
 //Utils
 void checkTweeterAccessible(int timeout);
+void makeTweetRequest(int timeout, float lat, float lon, camera_fb_t* frameBuffer);

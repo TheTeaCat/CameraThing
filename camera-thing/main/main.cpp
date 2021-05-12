@@ -104,26 +104,37 @@ void loop() {
   if(!prevButtonDown && buttonDown){
       //////////////////////////////////////////////////////////////////////
       //Taking photograph
-      //Turn on the LED while the camera is reading
+      //Turn on the LED while we get a frame buffer from the camera
       myLed.on();
 
-      //@todo: refactor to return JPEG data
-      //takePicture();
+      //Get the frame buffer
+      //@todo: refactor to return JPEG data?
+      camera_fb_t* frameBuffer = getFrameBuffer();
 
-      //If we're mocking delays, delay to pretend it takes a while to get an
-      //image from the camera module
+      //If we fail to get a frame buffer, signal an err and return.
+      if (!frameBuffer) {
+        Serial.println("[Loop] - Failed to get frame buffer :(");
+        //Blink fast to signal something bad has happened that needs debugging
+        myLed.blink(100);
+        WAIT_MS(5000);
+        myLed.off();
+        return;
+      }
+
+      //If we're mocking delays, delay to pretend it takes a while to get a
+      //frame buffer from the camera module
       #ifdef MOCKDELAY
         Serial.printf("[MockDelay] - Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
         WAIT_MS(MOCKDELAY);
       #endif
 
-      //Turn the LED off now the camera is done.
+      //Turn the LED off now the camera is done
       myLed.off();
 
       //////////////////////////////////////////////////////////////////////
       //Geolocation
-      //Communicate geolocating by throbbing with slow attack, fast decay
-      myLed.throb(900,100);
+      //Communicate geolocating with a fast breathe
+      myLed.breathe(250);
 
       //Get geolocation with geolocate() function
       float lat; float lon;
@@ -139,13 +150,31 @@ void loop() {
       //Output geolocation to serial
       Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
 
-      //Turn the LED off now the GPS is done.
+      //Turn the LED off now the GPS is done
       myLed.off();
 
       //////////////////////////////////////////////////////////////////////
       //Upload
+      //Communicate uploading by throbbing with fast attack, slow decay
+      myLed.throb(900,100);
 
-      //@todo
+      //Upload the information to the tweet service
+      makeTweetRequest(5000,lat,lon,frameBuffer);
+
+      //Turn the LED off now the upload is done
+      myLed.off();
+
+      //////////////////////////////////////////////////////////////////////
+      //Returning the frameBuffer
+      //We have to return the frameBuffer to the camera so it can start writing
+      //to it again.
+      //Turn on the LED while we return the frame buffer to the camera
+      myLed.on();
+
+      returnFrameBuffer(frameBuffer);
+
+      //Turn the LED off now we've returned the frameBuffer
+      myLed.off();
 
       //////////////////////////////////////////////////////////////////////
       //Buttondown warning     

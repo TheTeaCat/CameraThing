@@ -76,19 +76,22 @@ void setupCamera(){
 }
 
 //takePicture gets an image from the camera's frame buffer and processes it.
-void takePicture(){
-    //acquire a frame
-    camera_fb_t * fb = esp_camera_fb_get();
-    if (!fb) {
-        ESP_LOGE(TAG, "Camera Capture Failed");
-        return;
-    }
+camera_fb_t* getFrameBuffer(){
+  //acquire a frame
+  camera_fb_t* fb = esp_camera_fb_get();
 
-    //Display the image in serial
-    frameBufferToSerial(fb);
+  //If it failed, log.
+  if (!fb) {
+      Serial.println("[getFrameBuffer] - Camera Capture Failed :(");
+  }
 
-    //return the frame buffer back to the driver for reuse
-    esp_camera_fb_return(fb);
+  //Always return fb
+  return fb;
+}
+
+//return the frame buffer back to the driver for reuse. Just a simple wrapper.
+void returnFrameBuffer(camera_fb_t* fb) {
+  esp_camera_fb_return(fb);
 }
 
 //frameBufferToSerial takes a frame buffer and outputs its information to 
