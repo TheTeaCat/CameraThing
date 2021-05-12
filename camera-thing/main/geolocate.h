@@ -5,7 +5,7 @@
 #include <Adafruit_GPS.h>
 
 //Setup
-void setupGPS();
+bool setupGPS();
 
 //Utils
 bool geolocate(float* lat, float* lon, int timeout);

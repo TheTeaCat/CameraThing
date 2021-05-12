@@ -59,8 +59,16 @@ void setup() {
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
 
-  //Setup GPS
-  setupGPS();
+  //Setup GPS. Blink to signal failure for 5 seconds if this fails.
+  Serial.println("Setting up GPS...");
+  bool gpsSuccess = setupGPS();
+  if (!gpsSuccess) {
+    Serial.println("Failed to setup GPS :(");
+    myLed.blink(100);
+    WAIT_MS(5000);
+    ESP.restart();
+  }
+  Serial.println("Set up GPS!");
 
   //Setup camera (this may take a while if something has gone wrong)
   Serial.println("Setting up camera...");

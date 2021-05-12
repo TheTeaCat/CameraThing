@@ -12,15 +12,21 @@ Adafruit_GPS GPS(&GPSSerial);
 /////////////////////////////////////////////////////////////////////////////
 // Setup
 
-void setupGPS() {
-  //9600 NMEA is default baud for Adafruit GPS board
-  GPS.begin(9600);
+bool setupGPS() {
+  //9600 NMEA is default baud for Adafruit GPS board. May fail here if GPS board
+  //fails to init.
+  bool success = GPS.begin(9600);
+  if (!success) {
+    return false;
+  }
   //We only one the GPGGA
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
   //Set update rate to 1HS
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
   //We ain't using an antenna stop giving me $PGTOP sentences I don't care
   GPS.sendCommand(PGCMD_NOANTENNA);
+  //Return true for success!
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
