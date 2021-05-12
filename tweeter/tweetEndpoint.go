@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -119,7 +120,8 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	three labels*/
 	tweetBody := ""
 	for i := 0; i < 5 && i < len(labels); i++ {
-		tweetBody += "#" + strings.ReplaceAll(strings.Title(labels[i].Label), " ", "") + " "
+		reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
+		tweetBody += "#" + reg.ReplaceAllString(strings.Title(labels[i].Label), "")
 	}
 	//If no labels were returned, use a default name
 	if len(labels) == 0 {
