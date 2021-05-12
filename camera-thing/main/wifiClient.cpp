@@ -65,23 +65,25 @@ bool setupWifiManager() {
   #endif
 }
 
-void checkTweeterAccessible(int timeout) {
-  //Connect to tweeter
+bool checkTweeterAccessible(int timeout) {
+  //Connect to tweeter. If fails to connect, log & return false for fail
   Serial.printf("[checkTweeterAccessible] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
   if (!wifiClient.connect(TWEETER_HOST, TWEETER_PORT)) {
     Serial.println("[checkTweeterAccessible] - Failed to connect :(");
-    return;
+    return false;
   }
 
   //Construct request
   char *req = "GET /health HTTP/1.1\r\n"
               "Host: " TWEETER_HOST "\r\n"
               "Connection: close\r\n\r\n";
+
+  //Display request in serial
   Serial.println("[checkTweeterAccessible] -------------------------Request Start");
   Serial.print(req);
   Serial.println("[checkTweeterAccessible] -------------------------Request End");
 
-  //Make request to the tweeter's /health endpoint
+  //Make request
   Serial.println("[checkTweeterAccessible] - Making request...");
   wifiClient.print(req);
 
@@ -92,22 +94,35 @@ void checkTweeterAccessible(int timeout) {
     if(millis() - startTime > timeout) {
       Serial.println(" timed out :(");
       wifiClient.stop();
-      return;
+      return false;
     }
     WAIT_MS(1000);
     Serial.print(".");
   }
   Serial.println(" success!");
 
-  //Output response
-  Serial.println("[checkTweeterAccessible] -------------------------Response Start");
+  //Get response
+  Serial.println("[makeTweetRequest] -------------------------Response Start");
+  //Will be set to true if the response states 200 OK
+  bool success = false;
+  //While there are bytes left to print...
   while(wifiClient.available()) {
-    Serial.println(wifiClient.readStringUntil('\r'));
+    //Get a line...
+    String line = wifiClient.readStringUntil('\r');
+    //Print it to serial...
+    Serial.println(line);
+    //Then check if it states 200 OK...
+    if (line == "HTTP/1.1 200 OK") {
+      success = true;
   }
-  Serial.println("[checkTweeterAccessible] -------------------------Response End");
+  }
+  Serial.println("[makeTweetRequest] -------------------------Response End");
 
   //Close wifi client
   wifiClient.stop();
+
+  //Return the success flag!
+  return success;
 }
 
 bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {

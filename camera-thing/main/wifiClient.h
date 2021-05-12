@@ -6,5 +6,5 @@
 bool setupWifiManager();
 
 //Utils
-void checkTweeterAccessible(int timeout);
+bool checkTweeterAccessible(int timeout);
 bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen);

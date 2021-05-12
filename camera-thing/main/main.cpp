@@ -84,8 +84,16 @@ void setup() {
   }
   Serial.println("Set up WiFi!");
 
-  Serial.println("Checking tweeter service is accessible");
-  checkTweeterAccessible(60000);
+  //Check tweeter service is available. This may also take a while normally...
+  Serial.println("Checking tweeter service is accessible...");
+  bool tweeterSuccess = checkTweeterAccessible(60000);
+  if (!tweeterSuccess) {
+    Serial.println("Failed to check tweeter service health :(");
+    myLed.triangle(500); //triangle(500) for internet failure
+    WAIT_MS(5000);
+    ESP.restart();
+  }
+  Serial.println("Tweeter is accessible!");
 
   //If we're mocking delays, add 5s to the startup time.
   #ifdef MOCKDELAY
