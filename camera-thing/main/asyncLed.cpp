@@ -52,10 +52,6 @@ blinkAnimationParams* currBlinkAnimationParams;
 void AsyncLED::blink(int delay){
   Serial.printf("[AsyncLED.blink] [Pin %d] - Blinking with %d ms delay\n", pin, delay);
 
-  //Kill any currently running animations and clear their params before starting
-  //a new one!
-  killAnimation();
-
   //Create animation params
   currBlinkAnimationParams = new blinkAnimationParams{pin,channel,delay};
 
@@ -71,6 +67,12 @@ void AsyncLED::blink(int delay){
       WAIT_MS(params->delay);
     }
   };
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
 
   //Create new animation task
   xTaskCreatePinnedToCore(
