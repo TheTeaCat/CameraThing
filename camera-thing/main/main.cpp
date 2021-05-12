@@ -18,7 +18,7 @@
 //_could_ take a considerable amount of time. The delays applied are the value
 //of MOCKDELAY in ms, for example MOCKDELAY=1000 would apply delays of 1 second.
 //All the instances of MOCKDELAY being used should occur in this file, main.cpp.
-#define MOCKDELAY 2500
+// #define MOCKDELAY 2500
 
 /////////////////////////////////////////////////////////////////////////////
 // utilities
