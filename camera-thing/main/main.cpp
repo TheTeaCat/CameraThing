@@ -129,6 +129,9 @@ void loop() {
         WAIT_MS(MOCKDELAY);
       #endif
 
+      //Output success
+      Serial.println("[Loop] - Got JPEG from camera");
+
       //Turn the LED off now the camera is done
       myLed.off();
 
