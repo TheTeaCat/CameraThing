@@ -85,11 +85,14 @@ void getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
 
   //If it failed, log.
   if (!frameBuffer) {
-      Serial.println("[getFrameBuffer] - Camera Capture Failed :(");
+    Serial.println("[getFrameBuffer] - Camera Capture Failed :(");
   }
 
   //Compress frameBuffer to JPEG
-  frame2jpg(frameBuffer, 80, jpgBuffer, jpgLen);
+  bool converted = frame2jpg(frameBuffer, 80, jpgBuffer, jpgLen);
+  if (!converted) {
+    Serial.println("[getFrameBuffer] - JPEG conversion Failed :(");
+  }
 
   //return the frame buffer back to the driver for reuse
   esp_camera_fb_return(frameBuffer);
