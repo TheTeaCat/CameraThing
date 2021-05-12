@@ -70,7 +70,7 @@ void checkTweeterAccessible(int timeout) {
   }
 
   //Construct request
-  String req = String("GET / HTTP/1.1\r\n") + \
+  String req = String("GET /health HTTP/1.1\r\n") + \
     "Host: " + TWEETER_HOST + "\r\n\r\n";
   Serial.println("[checkTweeterAccessible] -------------------------Request Start");
   Serial.print(req);
