@@ -288,12 +288,17 @@ void AsyncLED::killAnimation() {
     delete(currBlinkAnimationParams);
     currBlinkAnimationParams = nullptr;
   }
+  if (currTriangleAnimationParams != nullptr) {
+    Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting blink animation params\n", pin);
+    delete(currTriangleAnimationParams);
+    currTriangleAnimationParams = nullptr;
+  }
   if (currBreatheAnimationParams != nullptr) {
     Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting breathe animation params\n", pin);
     delete(currBreatheAnimationParams);
     currBreatheAnimationParams = nullptr;
   }
-  if (currBreatheAnimationParams != nullptr) {
+  if (currThrobAnimationParams != nullptr) {
     Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting throb animation params\n", pin);
     delete(currThrobAnimationParams);
     currThrobAnimationParams = nullptr;
