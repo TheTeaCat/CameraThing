@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image/jpeg"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/nfnt/resize"
 )
 
 type tweetEndpoint struct {
@@ -127,8 +130,30 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Add the location to the tweet
 	tweetBody += fmt.Sprintf("(%.5f,%.5f)", lat, long)
 
+	//Decode image into jpeg
+	img, err := jpeg.Decode(bytes.NewReader(imageBytes))
+	if err != nil {
+		log.Printf("[500] [/tweet] - Failed to decode image as jpeg, err: %[1]v", err.Error())
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Failed to decode image as jpeg")
+		return
+	}
+
+	//Upscale image with no interpolation
+	bigImg := resize.Resize(1280, 0, img, resize.NearestNeighbor)
+	bigImgBytesBuf := new(bytes.Buffer)
+	err = jpeg.Encode(bigImgBytesBuf, bigImg, nil)
+	if err != nil {
+		log.Printf("[500] [/tweet] - Failed to upscale image, err: %[1]v", err.Error())
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Failed to upscale image")
+		return
+	}
+
 	//Make tweet
-	err = myTweeter.tweetWithImage(tweetBody, imageBytes)
+	err = myTweeter.tweetWithImage(tweetBody, bigImgBytesBuf.Bytes())
 	if err != nil {
 		log.Printf("[500] [/tweet] - Failed to tweet image, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
