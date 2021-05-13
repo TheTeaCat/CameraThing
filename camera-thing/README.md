@@ -102,7 +102,7 @@ Step 1: Turn it off and on again.
 
 ### Hardware failure
 
-These are indicated by a [hardware failure animation](#hardware-faulure-animation).
+These are indicated by a [hardware failure animation](#hardware-failure-animation).
 
 In the case of a hardware failure, it's probably best to just find a computer and have a look at what the device is saying in the serial output. If you're out and about with device, and this isn't an option, then it could be worth checking the wiring is OK; something could have just slipped from the GPS or camera module.
 
@@ -110,7 +110,7 @@ In the case of a hardware failure, it's probably best to just find a computer an
 
 ### Network failure
 
-These are indicated by a [network failure animation](#network-faulure-animation).
+These are indicated by a [network failure animation](#network-failure-animation).
 
 If the device is saying there's a network failure, then the first thing to check is that your WiFi network is working - if you're using a mobile hotspot from your phone, has your phone just ran out of battery or turned its hotspot off?
 
