@@ -44,6 +44,14 @@ void AsyncLED::set(int dutyCycle){
 // Blink animation
 // A blink animation cycles on->off->on with a delay between each switch like a
 // square wave
+// An example of a blink animation:
+//     ___     ___     ___     ___     ___     ___     ___     ___     ___   
+//    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
+//    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
+//    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
+//    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
+// ___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |__
+
 
 struct blinkAnimationParams {
   int pin;
@@ -91,6 +99,13 @@ void AsyncLED::blink(int delay){
 // Triangle animation
 // A triangle animation cycles off->on->off like blink but ramps up brightness 
 // linearly, then back down linearly over the given period
+// An example of a triangle animation:
+//           .'.                   .'.                   .'.                 
+//         .'   '.               .'   '.               .'   '.               
+//       .'       '.           .'       '.           .'       '.           .'
+//     .'           '.       .'           '.       .'           '.       .'  
+//   .'               '.   .'               '.   .'               '.   .'    
+// .'                   '.'                   '.'                   '.'      
 
 struct triangleAnimationParams {
   int pin;
@@ -151,6 +166,13 @@ void AsyncLED::triangle(int period) {
 // Breathe animation
 // A breathing animation cycles off->on->off like triangle or blink, but ramps
 // up and down following a sine wave that loops every `period` milliseconds
+// An example of a breathe animation:
+//               _.-'-._                           _.-'-._                    
+//            _.'       '._                     _.'       '._                 
+//          _'             '_                 _'             '_               
+//        _'                 '_             _'                 '_             
+//     _.'                     '._       _.'                     '._       _.
+// _.-'                           '-._.-'                           '-._.-'   
 
 struct breatheAnimationParams {
   int pin;
@@ -210,6 +232,13 @@ void AsyncLED::breathe(int period) {
 // durations, and overall durations of these two attack and decay values.
 // `attack` and `decay` are both periods in milliseconds. This animation is 
 // exactly the same as breathe when `attack` is the same as `delay`.
+// An example of a throb animation (fast attack, slow decay):
+//         _-'--..__                            _-'--..__                     
+//       _'         ''._                      _'         ''._                 
+//      _               '_                   _               '_               
+//     _                  '_                _                  '_             
+//    _                     '..__          _                     '..__        
+// _-'                           ''--..__-'                           ''--.._
 
 struct throbAnimationParams {
   int pin;
@@ -273,12 +302,13 @@ void AsyncLED::throb(int attack, int decay) {
 // Step animation
 // A step animation increases brightness linearly over `period` ms in `steps`
 // steps (levels of brightness), then returns to off.
+// An example of a 6-step animation, looping just over thrice:
 //                     ___                     ___                     ___ 
 //                 ___|   |                ___|   |                ___|   |
 //             ___|       |            ___|       |            ___|       |
 //         ___|           |        ___|           |        ___|           |
 //     ___|               |    ___|               |    ___|               |
-// ___|                   |___|                   |___|                   |___|
+// ___|                   |___|                   |___|                   |__
 
 struct stepAnimationParams {
   int pin;
