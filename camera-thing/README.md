@@ -51,6 +51,8 @@ The state of the device is then communicated through a single LED, using a numbe
 
 ### Hardware failure animation
 
+See the [startup](#Startup) and [taking a picture](#Taking a picture) sections for details on what causes these.
+
 The animation used for a hardware failure during the image-taking flow is `blink(100)` for 2 seconds.
 
 ```
@@ -68,6 +70,8 @@ Each on or off period lasts 100ms.
 
 
 ### Network failure animation
+
+See the [startup](#Startup) and [taking a picture](#Taking a picture) sections for details on what causes these.
 
 The animation used for a network failure during the image-taking flow is `step(1000,4)` for 3 seconds.
 
