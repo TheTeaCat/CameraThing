@@ -15,6 +15,25 @@ The details of your tweeter service also need to be set in `secrets.h`.
 
 The UI for the CameraThing is simple. It consists of: a button, *and* an LED!
 
+
+
+### Startup
+
+During startup, the LED breathes slowly.
+
+Startup may fail for four reasons:
+
+1. Setting up the GPS module fails (probably bad wiring). This will trigger a [hardware failure animation](#Hardware failure animation) before restarting the CameraThing.
+2. Setting up the camera fails (also probably bad wiring, or unsupported camera config - too high resolution/unsupported colour type). This will trigger a [hardware failure animation](#Hardware failure animation) before restarting the CameraThing.
+3. Connecting to WiFi fails (this will take a long time as up to 5 attempts are made, each lasting 1 minute). This should only happen if the network credentials are invalid or the WiFi network specified couldn't be found. This will trigger a [network failure animation](#Network failure animation) before restarting the CameraThing.
+4. The CameraThing couldn't contact the tweeter service's `/health` endpoint, or the tweeter service's `/health` endpoint returned a response code other than `200 OK`. This could happen if the tweeter service is down, or having difficulty at the moment. This will trigger a [network failure animation](#Network failure animation) before restarting the CameraThing.
+
+If everything goes well, the LED should just happily breathe for a few seconds while all the above runs through. Once it's finished, the LED is extinguished.
+
+
+
+### Taking a picture
+
 Typical user flow for taking an image is as follows:
 
 1. Press the button to take a picture.
