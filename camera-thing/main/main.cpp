@@ -38,7 +38,7 @@ int loopN = 0;
 AsyncLED myLed = AsyncLED(ledPin, 15);
 
 /////////////////////////////////////////////////////////////////////////////
-// arduino-land entry points
+// Setup
 
 void setup() {
   //Make LED breathe during setup
@@ -105,6 +105,9 @@ void setup() {
   //Turn LED off again now setup
   myLed.off();
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// Loop
 
 void loop() {
   //Determine if the button is down
