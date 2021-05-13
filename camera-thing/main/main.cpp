@@ -52,30 +52,6 @@ void setup() {
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
 
-  //Setup GPS. Should be pretty fast...
-  Serial.println("Setting up GPS...");
-  bool gpsSuccess = setupGPS();
-  if (!gpsSuccess) {
-    Serial.println("Failed to setup GPS :(");
-    //Signal hardware failure
-    myLed.blink(100);
-    WAIT_MS(2000);
-    ESP.restart();
-  }
-  Serial.println("Set up GPS!");
-
-  //Setup camera. This may take a while if something has gone wrong...
-  Serial.println("Setting up camera...");
-  bool cameraSuccess = setupCamera();
-  if (!cameraSuccess) {
-    Serial.println("Failed to setup camera :(");
-    //Signal hardware failure
-    myLed.blink(100);
-    WAIT_MS(2000);
-    ESP.restart();
-  }
-  Serial.println("Set up camera!");
-
   //Setup wifi. This may take a while normally...
   Serial.println("Setting up network connection...");
   bool networkSuccess = setupNetworkConn();
@@ -100,6 +76,30 @@ void setup() {
   }
   Serial.println("Tweeter is accessible!");
 
+  //Setup GPS. Should be pretty fast...
+  Serial.println("Setting up GPS...");
+  bool gpsSuccess = setupGPS();
+  if (!gpsSuccess) {
+    Serial.println("Failed to setup GPS :(");
+    //Signal hardware failure
+    myLed.blink(100);
+    WAIT_MS(2000);
+    ESP.restart();
+  }
+  Serial.println("Set up GPS!");
+
+  //Setup camera. This may take a while if something has gone wrong...
+  Serial.println("Setting up camera...");
+  bool cameraSuccess = setupCamera();
+  if (!cameraSuccess) {
+    Serial.println("Failed to setup camera :(");
+    //Signal hardware failure
+    myLed.blink(100);
+    WAIT_MS(2000);
+    ESP.restart();
+  }
+  Serial.println("Set up camera!");
+  
   //If we're mocking delays, add MOCKDELAY ms to the startup time.
   #ifdef MOCKDELAY
     Serial.printf("[MockDelay] - Mocking a longer setup time by waiting %d ms...\n", MOCKDELAY);
