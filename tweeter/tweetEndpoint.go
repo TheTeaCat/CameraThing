@@ -52,19 +52,16 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//////////////////////////////////////////////////////////////////////
 	//Get GPS location from request
+	//We only add GPS data to the tweet if both lat and long are provided
+	longitudeProvided := true
+	latitudeProvided := true
+
 	latStr := r.FormValue("lat")
 	lat, err := strconv.ParseFloat(latStr, 64)
 	if latStr == "" || err != nil {
-		log.Println("[400] [/tweet] - No latitude supplied")
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		if latStr == "" {
-			json.NewEncoder(w).Encode("No latitude supplied.")
-		} else {
-			json.NewEncoder(w).Encode("Latitude not float64")
-		}
-		return
+		latitudeProvided = false
 	} else if lat < -180 || lat > 180 {
 		log.Println("[400] [/tweet] - Latitude out of range")
 		w.Header().Set("Content-Type", "application/json")
@@ -72,18 +69,11 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Latitude out of range (min -180, max 180)")
 		return
 	}
+
 	longStr := r.FormValue("long")
 	long, err := strconv.ParseFloat(longStr, 64)
 	if longStr == "" || err != nil {
-		log.Println("[400] [/tweet] - No longitude supplied")
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		if latStr == "" {
-			json.NewEncoder(w).Encode("No longitude supplied.")
-		} else {
-			json.NewEncoder(w).Encode("Longitude not float64")
-		}
-		return
+		longitudeProvided = false
 	} else if long < -90 || long > 90 {
 		log.Println("[400] [/tweet] - Longitude out of range")
 		w.Header().Set("Content-Type", "application/json")
@@ -92,6 +82,23 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !longitudeProvided && !latitudeProvided {
+		log.Println("      [/tweet] - No longitude or latitude provided, not using geolocation")
+	} else if longitudeProvided && latitudeProvided {
+		log.Println("      [/tweet] - Longitude and latitude provided, using geolocation")
+	} else {
+		if longitudeProvided {
+			log.Println("[400] [/tweet] - Only longitude provided")
+		} else {
+			log.Println("[400] [/tweet] - Only latitude provided")
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Longitude and latitude must be provided, or neither")
+		return
+	}
+
+	//////////////////////////////////////////////////////////////////////
 	//Read image from form
 	imageFile, _, err := r.FormFile("image")
 	if err != nil {
@@ -103,6 +110,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	}
 	defer imageFile.Close()
 
+	//////////////////////////////////////////////////////////////////////
 	//Get image data out into slice of bytes
 	var imageBuffer bytes.Buffer
 	io.Copy(&imageBuffer, imageFile)
@@ -118,6 +126,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//////////////////////////////////////////////////////////////////////
 	//Construct a tweetBody of up to five labels followed by question marks
 	tweetBody := ""
 	for i := 0; i < 5 && i < len(labels); i++ {
@@ -127,9 +136,12 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	if len(labels) == 0 {
 		tweetBody = "I have no idea. "
 	}
-	//Add the location to the tweet
-	tweetBody += fmt.Sprintf("(%.5f,%.5f)", lat, long)
+	//Add the location to the tweet if we have both lat and long
+	if longitudeProvided && latitudeProvided {
+		tweetBody += fmt.Sprintf("(%.5f,%.5f)", lat, long)
+	}
 
+	//////////////////////////////////////////////////////////////////////
 	//Decode image into jpeg
 	img, err := jpeg.Decode(bytes.NewReader(imageBytes))
 	if err != nil {
@@ -140,6 +152,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//////////////////////////////////////////////////////////////////////
 	//Upscale image with no interpolation
 	bigImg := resize.Resize(1280, 0, img, resize.NearestNeighbor)
 	bigImgBytesBuf := new(bytes.Buffer)
