@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "camera.h"
 #include "geolocate.h"
-#include "wifiClient.h"
+#include "tweeter.h"
 #include "asyncLed.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,16 +77,16 @@ void setup() {
   Serial.println("Set up camera!");
 
   //Setup wifi. This may take a while normally...
-  Serial.println("Setting up WiFi...");
-  bool wifiSuccess = setupWifiManager(60, 5);
-  if (!wifiSuccess) {
-    Serial.println("Failed to WiFi connection :(");
+  Serial.println("Setting up network connection...");
+  bool networkSuccess = setupNetworkConn();
+  if (!networkSuccess) {
+    Serial.println("Failed to connect to network :(");
     //Signal network failure
     myLed.step(1000,4);
     WAIT_MS(3000);
     ESP.restart();
   }
-  Serial.println("Set up WiFi!");
+  Serial.println("Set up network connection!");
 
   //Check tweeter service is available. This may also take a while normally...
   Serial.println("Checking tweeter service is accessible...");

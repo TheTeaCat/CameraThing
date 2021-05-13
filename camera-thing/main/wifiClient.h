@@ -3,8 +3,4 @@
 // the tweeter service
 
 //Setup
-bool setupWifiManager(int maxTrials, int maxAttempts);
-
-//Tweeter service communication utils
-bool checkTweeterAccessible(int timeout);
-bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen);
+bool setupWifiClient(int maxTrials, int maxAttempts);
