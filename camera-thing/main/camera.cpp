@@ -120,15 +120,16 @@ bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
 // Debug utils
 
 //frameBufferToSerial takes a frame buffer and outputs its information to 
-//serial, including the image formatted as ASCII characters.
-void frameBufferToSerial(camera_fb_t* fb) {
+//serial, including the image formatted as ASCII characters. Will mess up up the
+//image upload.
+void frameBufferToSerial(camera_fb_t* frameBuffer) {
     //Display the frame buffer in serial using an ASCII scale
     String scale = " .:-=+*#%@";
-    int len = fb->len;
+    int len = frameBuffer->len;
+    int byteWidth = len/frameBuffer->height; //Width of each row in Bytes
     for(int i = 0; i < len; i++) {
-      Serial.print(scale[*(fb->buf+i)/26]);
-      Serial.print(scale[*(fb->buf+i)/26]);
-      if(i % (fb->width) == (fb->width)-1) {
+      Serial.print(scale[*(frameBuffer->buf+i)/26]);
+      if(i % byteWidth == byteWidth-1) {
         Serial.print("\n");
       }
     }
@@ -136,6 +137,7 @@ void frameBufferToSerial(camera_fb_t* fb) {
     //Then display the image metadata
     Serial.printf(
       "Width: %d, Height: %d, Len: %d, Format: %d\n", 
-      fb->width, fb->height, fb->len, fb->format
+      frameBuffer->width, frameBuffer->height, 
+      frameBuffer->len, frameBuffer->format
     );
 }
