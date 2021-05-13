@@ -41,12 +41,13 @@ AsyncLED myLed = AsyncLED(ledPin, 15);
 // arduino-land entry points
 
 void setup() {
+  //Make LED breathe during setup
+  myLed.breathe(500);
+
+  //Setup serial output
   Serial.begin(115200);
   Serial.println("arduino started");
   Serial.printf("\nwire pins: sda=%d scl=%d\n", SDA, SCL);
-
-  //Make LED breathe during setup
-  myLed.breathe(500);
 
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
@@ -122,110 +123,107 @@ void loop() {
 
   //Take a picture if the button has just been pressed
   if(!prevButtonDown && buttonDown){
-      //////////////////////////////////////////////////////////////////////
-      //Taking photograph
-      //Turn on the LED while we get a frame buffer from the camera
-      myLed.on();
+    //////////////////////////////////////////////////////////////////////
+    //Taking photograph
+    //Turn on the LED while we get a JPEG from the camera
+    myLed.on();
 
-      //Get a JPEG from the camera
-      uint8_t *jpgBuffer;
-      size_t jpgLen;
-      bool gotJPEG = getJPEG(&jpgBuffer, &jpgLen);
+    //Get a JPEG from the camera
+    uint8_t *jpgBuffer;
+    size_t jpgLen;
+    bool gotJPEG = getJPEG(&jpgBuffer, &jpgLen);
 
-      //If we fail to get a frame buffer, signal an err and return.
-      if (!gotJPEG || jpgLen == 0) {
-        Serial.println("[Loop] - Failed to get JPEG :(");
-        //Blink fast to signal something bad has happened that needs debugging
-        myLed.blink(100);
-        WAIT_MS(2000);
-        myLed.off();
-        return;
-      }
-
-      //If we're mocking delays, delay to pretend it takes a while to get a
-      //frame buffer from the camera module
-      #ifdef MOCKDELAY
-        Serial.printf("[MockDelay] - Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
-        WAIT_MS(MOCKDELAY);
-      #endif
-
-      //Output success
-      Serial.println("[Loop] - Got JPEG from camera");
-
-      //Turn the LED off now the camera is done
+    //If we fail to get a frame buffer, signal an err and return.
+    if (!gotJPEG || jpgLen == 0) {
+      Serial.println("[Loop] - Failed to get JPEG :(");
+      myLed.blink(100); //blink(100) for hardware failure
+      WAIT_MS(2000);
       myLed.off();
+      return;
+    }
 
-      //////////////////////////////////////////////////////////////////////
-      //Geolocation
-      //Communicate geolocating with a fast breathe
-      myLed.breathe(250);
+    //If we're mocking delays, delay to pretend it takes a while to get a
+    //frame buffer from the camera module
+    #ifdef MOCKDELAY
+      Serial.printf("[MockDelay] - Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
+      WAIT_MS(MOCKDELAY);
+    #endif
 
-      //Get geolocation with geolocate() function
-      float lat; float lon;
-      bool gotGeolocation = geolocate(&lat, &lon, 1000);
+    //Output success
+    Serial.println("[Loop] - Got JPEG from camera");
 
-      //If we're mocking delays, delay to pretend it takes a while to get a 
-      //geolocation from the GPS featherwing
-      #ifdef MOCKDELAY
-        Serial.printf("[MockDelay] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
-        WAIT_MS(MOCKDELAY);
-      #endif
+    //Turn the LED off now the camera is done
+    myLed.off();
 
-      //If there is some err getting the geolocation data, signal an err and 
-      //return.
-      if(!gotGeolocation) {
-        //Blink fast to signal something bad has happened that needs debugging
-        myLed.blink(100);
-        WAIT_MS(2000);
-        myLed.off();
-        return;
-      }
+    //////////////////////////////////////////////////////////////////////
+    //Geolocation
+    //Communicate geolocating with a fast breathe
+    myLed.breathe(250);
 
-      //Output geolocation to serial
-      Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
+    //Get geolocation with geolocate() function
+    float lat; float lon;
+    bool gotGeolocation = geolocate(&lat, &lon, 1000);
 
-      //Turn the LED off now the GPS is done
+    //If we're mocking delays, delay to pretend it takes a while to get a 
+    //geolocation from the GPS featherwing
+    #ifdef MOCKDELAY
+      Serial.printf("[MockDelay] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
+      WAIT_MS(MOCKDELAY);
+    #endif
+
+    //If there is some err getting the geolocation data, signal an err and 
+    //return.
+    if(!gotGeolocation) {
+      myLed.blink(100); //blink(100) for hardware failure
+      WAIT_MS(2000);
       myLed.off();
+      return;
+    }
 
-      //////////////////////////////////////////////////////////////////////
-      //Upload
-      //Communicate uploading by throbbing with fast attack, slow decay
-      myLed.throb(900,100);
+    //Output geolocation to serial
+    Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
 
-      //Upload the information to the tweet service
-      bool tweetSuccess = makeTweetRequest(30000,lat,lon,&jpgBuffer,&jpgLen);
+    //Turn the LED off now the GPS is done
+    myLed.off();
 
-      //If we're mocking delays, delay to pretend it takes a while to send the
-      //data to the tweeter service
-      #ifdef MOCKDELAY
-        Serial.printf("[MockDelay] - Mocking a slower tweet response by waiting %d ms...\n", MOCKDELAY);
-        WAIT_MS(MOCKDELAY);
-      #endif
+    //////////////////////////////////////////////////////////////////////
+    //Upload
+    //Communicate uploading by throbbing with fast attack, slow decay
+    myLed.throb(900,100);
 
-      //If there is some err getting the data to the tweeter, signal an err and 
-      //return.
-      if(!tweetSuccess) {
-        //Blink fast to signal something bad has happened that needs debugging
-        myLed.blink(100);
-        WAIT_MS(2000);
-        myLed.off();
-        return;
-      }
+    //Upload the information to the tweet service
+    bool tweetSuccess = makeTweetRequest(30000,lat,lon,&jpgBuffer,&jpgLen);
 
-      //Turn the LED off now the upload is done
+    //If we're mocking delays, delay to pretend it takes a while to send the
+    //data to the tweeter service
+    #ifdef MOCKDELAY
+      Serial.printf("[MockDelay] - Mocking a slower tweet response by waiting %d ms...\n", MOCKDELAY);
+      WAIT_MS(MOCKDELAY);
+    #endif
+
+    //If there is some err getting the data to the tweeter, signal an err and 
+    //return.
+    if(!tweetSuccess) {
+      myLed.triangle(500); //triangle(500) for internet failure
+      WAIT_MS(2000);
       myLed.off();
+      return;
+    }
 
-      //////////////////////////////////////////////////////////////////////
-      //Cleanup
-      //Delete the jpgBuffer now we're done with it so we don't have a memory 
-      //leak!
-      delete jpgBuffer;
+    //Turn the LED off now the upload is done
+    myLed.off();
 
-      //////////////////////////////////////////////////////////////////////
-      //Buttondown warning     
-      //Start flashing quickly (will only stay on if the button is still pressed
-      //down; otherwise turned off in the next loop)
-      myLed.blink(100);
+    //////////////////////////////////////////////////////////////////////
+    //Cleanup
+    //Delete the jpgBuffer now we're done with it so we don't have a memory 
+    //leak!
+    delete jpgBuffer;
+
+    //////////////////////////////////////////////////////////////////////
+    //Buttondown warning     
+    //Start flashing quickly (will only stay on if the button is still pressed
+    //down; otherwise turned off in the next loop)
+    myLed.blink(50);
   }
 
   //Give background processes some time
