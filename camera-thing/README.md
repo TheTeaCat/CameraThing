@@ -42,10 +42,10 @@ Incredible
 
 The state of the device is then communicated through a single LED, using a number of animations defined in `main/asyncLed.cpp`.
 
-1. The camera is getting and processing an image from the camera. During this period, the LED is simply **on**. If there is a failure at this point (camera or jpeg encoding failed), the LED does a **hardware failure animation**.
+1. The camera is getting and processing an image from the camera. During this period, the LED is simply **on**. If there is a failure at this point (camera or jpeg encoding failed), the LED does a [hardware failure animation](#Hardware failure animation).
 2. The camera is awaiting user preference for whether a geolocation should be supplied - the device waits for 2.4 seconds while performing a **fast breathe animation**. If the button is not down at the end of this period, then geolocation data is not used - handy if you're taking a picture at home and don't want to put your kitchen's GPS coordinates on the internet.
-3. If the user chose to add geolocation data to the tweet, the camera is gets a longitude and latitude from the GPS module. This is communicated by a **"throb" animation with fast attack and slow decay** - to me, this signifies "pulling" or "down" which feels apt as we're pulling information from GPS sattelites. If we fail to get a geolocation, the LED does a **hardware failure animation**.
-4. The camera is making a request to the tweeter service's `/tweet` endpoint. This is communicated by a **"throb" animation with slow attack and fast decay**, which signifies "pushing" or "up" to me, which makes sense as we're uploading the image to a cloud service. If this fails for any reason (including if the tweeter service returns a response code other than `201 Created`) then the LED does a **network failure animation** and then restarts the device.
+3. If the user chose to add geolocation data to the tweet, the camera is gets a longitude and latitude from the GPS module. This is communicated by a **"throb" animation with fast attack and slow decay** - to me, this signifies "pulling" or "down" which feels apt as we're pulling information from GPS sattelites. If we fail to get a geolocation, the LED does a **[hardware failure animation](#Hardware failure animation)**.
+4. The camera is making a request to the tweeter service's `/tweet` endpoint. This is communicated by a **"throb" animation with slow attack and fast decay**, which signifies "pushing" or "up" to me, which makes sense as we're uploading the image to a cloud service. If this fails for any reason (including if the tweeter service returns a response code other than `201 Created`) then the LED does a [network failure animation](#Network failure animation) and then restarts the device.
 
 
 
