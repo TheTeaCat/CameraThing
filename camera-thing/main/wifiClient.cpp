@@ -7,14 +7,20 @@
 #include "secrets.h"
 #include "esp_camera.h"
 
-WiFiClient wifiClient; // the TLS web client
+//Our WiFiClient instance
+WiFiClient wifiClient;
 
-String ip2str(IPAddress address) { // utility for printing IP addresses
+//Utility for printing IP addresses
+String ip2str(IPAddress address) {
   return
     String(address[0]) + "." + String(address[1]) + "." +
     String(address[2]) + "." + String(address[3]);
 }
 
+//setupWifiManager attempts to setup a wifi connection `maxAttempts` times, each 
+//attempt consisting of up to `maxTrials` tests of WiFi.status() to check if 
+//it's WL_CONNECTED yet. Each trial is spaced 1 second apart, so this will take
+//maxTrials * maxAttempts seconds to terminate at worst.
 bool setupWifiManager(int maxTrials, int maxAttempts) {
   //Return immediately if the apropriate config vars aren't set
   #ifndef WIFISSID
@@ -27,14 +33,14 @@ bool setupWifiManager(int maxTrials, int maxAttempts) {
   #endif
 
   #if defined(WIFISSID) && defined(WIFIPASSWORD)
-    //We try 5 times to connect to WiFi before giving up
+    //We try maxAttempts times to connect to WiFi before giving up
     for(int attempt = 0; attempt < maxAttempts; attempt++) {
       Serial.printf("[setupWifi] - Trying to connect to '%s'\n", WIFISSID);
       
       //Attempt to begin wifi conn
       WiFi.begin(WIFISSID, WIFIPASSWORD);
 
-      //We allow each attempt to run for 60 seconds
+      //We allow each attempt to run for maxTrials seconds
       bool success = false;
       Serial.print("[setupWifi] - Connecting...");
       for(int trial = 0; trial < maxTrials; trial++) {
@@ -65,6 +71,9 @@ bool setupWifiManager(int maxTrials, int maxAttempts) {
   #endif
 }
 
+//checkTweeterAccessible queries the tweeter's /health endpoint and checks that
+//the response code provided is 200 OK within a given timeout, in milliseconds.
+//It returns false for fail, true for success.
 bool checkTweeterAccessible(int timeout) {
   //Connect to tweeter. If fails to connect, log & return false for fail
   Serial.printf("[checkTweeterAccessible] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
@@ -125,6 +134,11 @@ bool checkTweeterAccessible(int timeout) {
   return success;
 }
 
+//makeTweetRequest makes a request to the tweeter service's /tweet endpoint, 
+//with a provided latitude, longitude and JPEG data, within a given timeout and
+//checks that the tweeter service returns a 201 Created response. If returns
+//false for fail, true for success. Pointers to the JPEG data are passed into
+//this function to save memory.
 bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
   //Connect to tweeter
   Serial.printf("[makeTweetRequest] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
