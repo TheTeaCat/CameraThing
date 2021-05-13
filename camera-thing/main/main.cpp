@@ -142,6 +142,7 @@ void loop() {
       myLed.blink(100); //blink(100) for hardware failure
       WAIT_MS(2000);
       myLed.off();
+      delete jpgBuffer;
       return;
     }
 
@@ -180,6 +181,7 @@ void loop() {
       myLed.blink(100); //blink(100) for hardware failure
       WAIT_MS(2000);
       myLed.off();
+        delete jpgBuffer;
       return;
     }
 
@@ -210,6 +212,7 @@ void loop() {
       myLed.triangle(500); //triangle(500) for internet failure
       WAIT_MS(2000);
       myLed.off();
+      delete jpgBuffer;
       return;
     }
 
