@@ -11,19 +11,26 @@ The tweeter is a service which is intended to run alongside an instance of [go-t
 A `POST` request should be made to this endpoint with:
 
 - A multipart request body consisting of an image encoded as bytes with the key `image`,
-- The following `GET` parameters:
-  - `auth`, the auth token specified by the [`TWEET_AUTH_TOKEN` environment variable](#TWEET_AUTH_TOKEN).
+- A `GET` parameter, `auth`, the auth token specified by the [`TWEET_AUTH_TOKEN` environment variable](#TWEET_AUTH_TOKEN).
+- Either both, or neither of the following `GET` parameters (providing just one will return a `400` error):
   - `long`, the longitude of the CameraThing where the image was taken.
   - `lat`, the latitude of the CameraThing where the image was taken.
 
 For example, the following curl request:
 
 ```bash
-$ curl "localhost:8080/tweet?auth=dev&lat=53.36097329965131&long=-1.6899902029658576" -F 'image=@./test.jpg'
-{"Tweet":"#Breakwater #Promontory #Seashore #GreyWhale #Wing (53.36097,-1.68999)"}
+curl "localhost:8080/tweet?auth=dev&lat=53.36097329965131&long=-1.6899902029658576" -F 'image=@./cat7.jpg'
+{"Tweet":"Mongoose? Wombat? Wallaby? Weasel? Chesapeake Bay Retriever? (53.36097,-1.68999)"}
 ```
 
-The response contains the text used in the tweet created for that image. The request may take a while as the image is processed by [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/) to create the tweet body before the client can be responded to.
+Or without geolocation:
+
+```bash
+curl "localhost:8080/tweet?auth=dev" -F 'image=@./cat7.jpg'
+{"Tweet":"Mongoose? Wombat? Wallaby? Weasel? Chesapeake Bay Retriever? "}
+```
+
+The response contains the text used in the tweet created for that image. The request may take a while as the image is processed by [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/) to create the tweet body, and post processed before the client can be responded to. The server does not return early so that the device can display if uploading a tweet failed for any reason, even server-side.
 
 
 
