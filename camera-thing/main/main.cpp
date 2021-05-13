@@ -42,7 +42,7 @@ AsyncLED myLed = AsyncLED(ledPin, 15);
 
 void setup() {
   //Make LED breathe during setup
-  myLed.breathe(500);
+  myLed.breathe(1000);
 
   //Setup serial output
   Serial.begin(115200);
@@ -57,7 +57,8 @@ void setup() {
   bool gpsSuccess = setupGPS();
   if (!gpsSuccess) {
     Serial.println("Failed to setup GPS :(");
-    myLed.blink(100); //blink(100) for hardware failure
+    //Signal hardware failure
+    myLed.blink(100);
     WAIT_MS(5000);
     ESP.restart();
   }
@@ -68,7 +69,8 @@ void setup() {
   bool cameraSuccess = setupCamera();
   if (!cameraSuccess) {
     Serial.println("Failed to setup camera :(");
-    myLed.blink(100); //blink(100) for hardware failure
+    //Signal hardware failure
+    myLed.blink(100);
     WAIT_MS(5000);
     ESP.restart();
   }
@@ -79,7 +81,8 @@ void setup() {
   bool wifiSuccess = setupWifiManager(60, 10);
   if (!wifiSuccess) {
     Serial.println("Failed to WiFi connection :(");
-    myLed.triangle(500); //triangle(500) for internet failure
+    //Signal network failure
+    myLed.step(1000,4);
     WAIT_MS(5000);
     ESP.restart();
   }
@@ -90,7 +93,8 @@ void setup() {
   bool tweeterSuccess = checkTweeterAccessible(60000);
   if (!tweeterSuccess) {
     Serial.println("Failed to check tweeter service health :(");
-    myLed.triangle(500); //triangle(500) for internet failure
+    //Signal network failure
+    myLed.step(1000,4);
     WAIT_MS(5000);
     ESP.restart();
   }
@@ -165,12 +169,15 @@ void loop() {
     //the button after a second
     float lat; float lon;
 
-    //Give the user 3.5 seconds to hold the button down to disable geolocation
+    //Give the user 2.4 seconds to hold the button down to disable geolocation
     Serial.println("[Loop] - Getting geolocation preference from user...");
-    myLed.step(1500,4); //Communicate with 3 loops of a 4-step 1.5s animation
-    WAIT_MS(3500);
-    //If the user has held down the button, no geolocation is used.
-    bool geolocationEnabled = digitalRead(buttonPin) == HIGH;
+
+    //Communicate input request with fast breathe
+    myLed.breathe(300);
+    WAIT_MS(2400);
+
+    //If the user has released the button after 2 seconds, geodata isn't used.
+    bool geolocationEnabled = digitalRead(buttonPin) == LOW;
     if(!geolocationEnabled) {
       Serial.println("[Loop] - Geolocation disabled.");
     } else {
@@ -179,7 +186,7 @@ void loop() {
 
     if (geolocationEnabled) {
       //Communicate geolocating with a fast breathe
-      myLed.breathe(250);
+      myLed.throb(900,100);
 
       //Get geolocation with geolocate() function
       bool gotGeolocation = geolocate(&lat, &lon, 1000);
@@ -214,8 +221,7 @@ void loop() {
     myLed.throb(900,100);
 
     //Upload the information to the tweet service
-    bool tweetSuccess = true;
-    //bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
+    bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
 
     //If we're mocking delays, delay to pretend it takes a while to send the
     //data to the tweeter service
@@ -227,11 +233,12 @@ void loop() {
     //If there is some err getting the data to the tweeter, signal an err and 
     //return.
     if(!tweetSuccess) {
-      myLed.triangle(500); //triangle(500) for internet failure
-      WAIT_MS(2000);
+      //Signal network failure
+      myLed.step(1000,4);
+      WAIT_MS(3000);
       myLed.off();
-      delete jpgBuffer;
-      return;
+      //Restart
+      ESP.restart();
     }
 
     //Turn the LED off now the upload is done

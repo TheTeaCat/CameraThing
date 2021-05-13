@@ -52,7 +52,6 @@ void AsyncLED::set(int dutyCycle){
 //    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
 // ___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |__
 
-
 struct blinkAnimationParams {
   int pin;
   int channel;
