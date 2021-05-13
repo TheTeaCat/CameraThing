@@ -12,6 +12,8 @@ Adafruit_GPS GPS(&GPSSerial);
 /////////////////////////////////////////////////////////////////////////////
 // Setup
 
+//setupGPS sets up the GPS featherwing. Returns false for fail, true for 
+//success.
 bool setupGPS() {
   //9600 NMEA is default baud for Adafruit GPS board. May fail here if GPS board
   //fails to init.
@@ -19,12 +21,16 @@ bool setupGPS() {
   if (!success) {
     return false;
   }
+
   //We only one the GPGGA
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
+
   //Set update rate to 1HS
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+
   //We ain't using an antenna stop giving me $PGTOP sentences I don't care
   GPS.sendCommand(PGCMD_NOANTENNA);
+
   //Return true for success!
   return true;
 }
@@ -33,8 +39,11 @@ bool setupGPS() {
 // Utils
 
 // Uncomment this to send the last NMEA from the GPS to serial
-// # define PRINTLASTNMEA
+// # define DEBUG_LAST_NMEA_TO_SERIAL
 
+//geolocate takes two float pointers and a timeout and attempts to get a 
+//longitude and latitude to write to the pointers within timeout milliseconds.
+//Returns false if it fails, or true for success.
 bool geolocate(float* lat, float* lon, int timeout) {
   int started = millis();
 
@@ -52,12 +61,12 @@ bool geolocate(float* lat, float* lon, int timeout) {
     //Attempt to parse new NMEA if recieved...
     if (GPS.newNMEAreceived()) {
       //Print it to serial before parsing if debugging
-      #ifdef PRINTLASTNMEA
+      #ifdef DEBUG_LAST_NMEA_TO_SERIAL
         Serial.println(GPS.lastNMEA());
       #endif
 
+      //If it doesn't parse, loop again
       if (!GPS.parse(GPS.lastNMEA())) {
-        //If it doesn't parse, loop again
         Serial.printf("[Geolocate] - Failed to parse NMEA, deltaT: %d ms\n", deltaT);
         continue;
       }
@@ -70,7 +79,7 @@ bool geolocate(float* lat, float* lon, int timeout) {
       *lat = GPS.latitudeDegrees;
       *lon = GPS.longitudeDegrees;
 
-      //then return true for success
+      //then return true for success!
       return true;
     };
   }
