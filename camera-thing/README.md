@@ -9,6 +9,7 @@ For how to build the device, you'll want to see [HARDWARE.md](./HARDWARE.md); an
 
 
 @todo
+
 ! [Add a picture of the CameraThing] ()
 
 
@@ -40,9 +41,9 @@ Typical user flow for taking an image is as follows:
 
 1. Press the button to take a picture.
 
-...
-
 Incredible
+
+
 
 The state of the device is then communicated through a single LED, using a number of animations defined in `main/asyncLed.cpp`.
 
