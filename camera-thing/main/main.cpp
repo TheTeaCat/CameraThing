@@ -59,7 +59,7 @@ void setup() {
     Serial.println("Failed to setup GPS :(");
     //Signal hardware failure
     myLed.blink(100);
-    WAIT_MS(5000);
+    WAIT_MS(2000);
     ESP.restart();
   }
   Serial.println("Set up GPS!");
@@ -71,19 +71,19 @@ void setup() {
     Serial.println("Failed to setup camera :(");
     //Signal hardware failure
     myLed.blink(100);
-    WAIT_MS(5000);
+    WAIT_MS(2000);
     ESP.restart();
   }
   Serial.println("Set up camera!");
 
   //Setup wifi. This may take a while normally...
   Serial.println("Setting up WiFi...");
-  bool wifiSuccess = setupWifiManager(60, 10);
+  bool wifiSuccess = setupWifiManager(60, 5);
   if (!wifiSuccess) {
     Serial.println("Failed to WiFi connection :(");
     //Signal network failure
     myLed.step(1000,4);
-    WAIT_MS(5000);
+    WAIT_MS(3000);
     ESP.restart();
   }
   Serial.println("Set up WiFi!");
@@ -95,7 +95,7 @@ void setup() {
     Serial.println("Failed to check tweeter service health :(");
     //Signal network failure
     myLed.step(1000,4);
-    WAIT_MS(5000);
+    WAIT_MS(3000);
     ESP.restart();
   }
   Serial.println("Tweeter is accessible!");
