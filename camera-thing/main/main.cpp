@@ -161,35 +161,52 @@ void loop() {
 
     //////////////////////////////////////////////////////////////////////
     //Geolocation
-    //Communicate geolocating with a fast breathe
-    myLed.breathe(250);
-
-    //Get geolocation with geolocate() function
+    //This step is optional and only completed if the user doesn't press down 
+    //the button after a second
     float lat; float lon;
-    bool gotGeolocation = geolocate(&lat, &lon, 1000);
 
-    //If we're mocking delays, delay to pretend it takes a while to get a 
-    //geolocation from the GPS featherwing
-    #ifdef MOCKDELAY
-      Serial.printf("[MockDelay] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
-      WAIT_MS(MOCKDELAY);
-    #endif
-
-    //If there is some err getting the geolocation data, signal an err and 
-    //return.
-    if(!gotGeolocation) {
-      myLed.blink(100); //blink(100) for hardware failure
-      WAIT_MS(2000);
-      myLed.off();
-        delete jpgBuffer;
-      return;
+    //Give the user 2.5 seconds to hold the button down to disable geolocation
+    Serial.println("[Loop] - Getting geolocation preference from user...");
+    myLed.triangle(2500); //Communicate this with a 5 second triangle wave
+    WAIT_MS(2500);
+    //If the user has held down the button, no geolocation is used.
+    bool geolocationEnabled = digitalRead(buttonPin) == HIGH;
+    if(!geolocationEnabled) {
+      Serial.println("[Loop] - Geolocation disabled.");
+    } else {
+      Serial.println("[Loop] - Geolocation enabled.");
     }
 
-    //Output geolocation to serial
-    Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
+    if (geolocationEnabled) {
+      //Communicate geolocating with a fast breathe
+      myLed.breathe(250);
 
-    //Turn the LED off now the GPS is done
-    myLed.off();
+      //Get geolocation with geolocate() function
+      bool gotGeolocation = geolocate(&lat, &lon, 1000);
+
+      //If we're mocking delays, delay to pretend it takes a while to get a 
+      //geolocation from the GPS featherwing
+      #ifdef MOCKDELAY
+        Serial.printf("[MockDelay] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
+        WAIT_MS(MOCKDELAY);
+      #endif
+
+      //If there is some err getting the geolocation data, signal an err and 
+      //return.
+      if(!gotGeolocation) {
+        myLed.blink(100); //blink(100) for hardware failure
+        WAIT_MS(2000);
+        myLed.off();
+        delete jpgBuffer;
+        return;
+      }
+
+      //Output geolocation to serial
+      Serial.printf("[Loop] - Got geolocation, lat: %f, long: %f\n", lat, lon);
+
+      //Turn the LED off now the GPS is done
+      myLed.off();
+    }
 
     //////////////////////////////////////////////////////////////////////
     //Upload
@@ -197,7 +214,7 @@ void loop() {
     myLed.throb(900,100);
 
     //Upload the information to the tweet service
-    bool tweetSuccess = makeTweetRequest(30000,lat,lon,&jpgBuffer,&jpgLen);
+    bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
 
     //If we're mocking delays, delay to pretend it takes a while to send the
     //data to the tweeter service

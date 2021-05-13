@@ -139,7 +139,7 @@ bool checkTweeterAccessible(int timeout) {
 //checks that the tweeter service returns a 201 Created response. If returns
 //false for fail, true for success. Pointers to the JPEG data are passed into
 //this function to save memory.
-bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
+bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
   //Connect to tweeter
   Serial.printf("[makeTweetRequest] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
   if (!wifiClient.connect(TWEETER_HOST, TWEETER_PORT)) {
@@ -149,9 +149,11 @@ bool makeTweetRequest(int timeout, float lat, float lon, uint8_t **jpgBuffer, si
 
   //Write request body
   Serial.println("[makeTweetRequest] - Writing request...");
-  wifiClient.printf("POST /tweet?auth=" TWEETER_AUTH_TOKEN 
-                    "&lat=%02.5f"
-                    "&long=%02.5f", lat, lon);
+  wifiClient.print("POST /tweet?auth=" TWEETER_AUTH_TOKEN);
+  if (geolocationEnabled) {
+    //Only add lat&long to GET params if geolocationEnabled
+    wifiClient.printf("&lat=%02.5f&long=%02.5f", lat, lon);
+  }
   wifiClient.print(" HTTP/1.1\r\n");
   wifiClient.print("Host: " TWEETER_HOST "\r\n");
   wifiClient.print("Content-Type: multipart/form-data;boundary=\"boundary\"\r\n");
