@@ -2,12 +2,14 @@
 
 The IoT device!
 
+This document provides an overview of how to use the device.
 
-## Setup
+For how to build the device, you'll want to see [HARDWARE.md](./HARDWARE.md); and to write the firmware to it, you'll want to see [FIRMWARE.md](./FIRMWARE.md).
 
-Wifi credentials must be set in `secrets.h`. An example can be found in `secrets.example.h`.
 
-The details of your tweeter service also need to be set in `secrets.h`.
+
+@todo
+! [Add a picture of the CameraThing] ()
 
 
 
@@ -38,13 +40,15 @@ Typical user flow for taking an image is as follows:
 
 1. Press the button to take a picture.
 
+...
+
 Incredible
 
 The state of the device is then communicated through a single LED, using a number of animations defined in `main/asyncLed.cpp`.
 
 1. The camera is getting and processing an image from the camera. During this period, the LED is simply **on**. If there is a failure at this point (camera or jpeg encoding failed), the LED does a [hardware failure animation](#Hardware failure animation).
 2. The camera is awaiting user preference for whether a geolocation should be supplied - the device waits for 2.4 seconds while performing a **fast breathe animation**. If the button is not down at the end of this period, then geolocation data is not used - handy if you're taking a picture at home and don't want to put your kitchen's GPS coordinates on the internet.
-3. If the user chose to add geolocation data to the tweet, the camera is gets a longitude and latitude from the GPS module. This is communicated by a **"throb" animation with fast attack and slow decay** - to me, this signifies "pulling" or "down" which feels apt as we're pulling information from GPS sattelites. If we fail to get a geolocation, the LED does a **[hardware failure animation](#Hardware failure animation)**.
+3. If the user chose to add geolocation data to the tweet, the camera is gets a longitude and latitude from the GPS module. This is communicated by a **"throb" animation with fast attack and slow decay** - to me, this signifies "pulling" or "down" which feels apt as we're pulling information from GPS satellites. If we fail to get a geolocation, the LED does a **[hardware failure animation](#Hardware failure animation)**.
 4. The camera is making a request to the tweeter service's `/tweet` endpoint. This is communicated by a **"throb" animation with slow attack and fast decay**, which signifies "pushing" or "up" to me, which makes sense as we're uploading the image to a cloud service. If this fails for any reason (including if the tweeter service returns a response code other than `201 Created`) then the LED does a [network failure animation](#Network failure animation) and then restarts the device.
 
 
@@ -87,6 +91,24 @@ Each step lasts 250ms.
 
 
 
-## Debugging
+## Troubleshooting
 
-The image from the camera can be outputted over serial by using `frameBufferToSerial` within the `takePicture` method. This is useful to make sure everything's wired up correctly.
+What can I do if it's not working?
+
+Step 1: Turn it off and on again.
+
+
+
+### Hardware failure
+
+In the case of a hardware failure, it's probably best to just find a computer and have a look at what the device is saying in the serial output. If you're out and about with device, and this isn't an option, then it could be worth checking the wiring is OK; something could have just slipped from the GPS or camera module.
+
+
+
+### Network failure
+
+If the device is saying there's a network failure, then the first thing to check is that your WiFi network is working - if you're using a mobile hotspot from your phone, has your phone just ran out of battery or turned its hotspot off?
+
+The next possibility is that your tweeter service has died or moved, which you can check by going to its `/health` endpoint in your browser to check it still says `"I'm Healthy!"`.
+
+If neither of these things work, you'll probably have to find a laptop to plug it into and check the serial output.
