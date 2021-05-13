@@ -165,10 +165,10 @@ void loop() {
     //the button after a second
     float lat; float lon;
 
-    //Give the user 2.5 seconds to hold the button down to disable geolocation
+    //Give the user 3.5 seconds to hold the button down to disable geolocation
     Serial.println("[Loop] - Getting geolocation preference from user...");
-    myLed.triangle(2500); //Communicate this with a 5 second triangle wave
-    WAIT_MS(2500);
+    myLed.step(1500,4); //Communicate with 3 loops of a 4-step 1.5s animation
+    WAIT_MS(3500);
     //If the user has held down the button, no geolocation is used.
     bool geolocationEnabled = digitalRead(buttonPin) == HIGH;
     if(!geolocationEnabled) {
@@ -214,7 +214,8 @@ void loop() {
     myLed.throb(900,100);
 
     //Upload the information to the tweet service
-    bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
+    bool tweetSuccess = true;
+    //bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
 
     //If we're mocking delays, delay to pretend it takes a while to send the
     //data to the tweeter service

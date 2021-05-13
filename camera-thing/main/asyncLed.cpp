@@ -270,6 +270,71 @@ void AsyncLED::throb(int attack, int decay) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Step animation
+// A step animation increases brightness linearly over `period` ms in `steps`
+// steps (levels of brightness), then returns to off.
+//                     ___                     ___                     ___ 
+//                 ___|   |                ___|   |                ___|   |
+//             ___|       |            ___|       |            ___|       |
+//         ___|           |        ___|           |        ___|           |
+//     ___|               |    ___|               |    ___|               |
+// ___|                   |___|                   |___|                   |___|
+
+struct stepAnimationParams {
+  int pin;
+  int channel;
+  int period;
+  int steps;
+};
+
+stepAnimationParams* currStepAnimationParams;
+
+void AsyncLED::step(int period, int steps) {
+  Serial.printf("[AsyncLED.step] [Pin %d] - Stepping with %d ms period in %d steps\n", pin, period, steps);
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
+
+  //Create animation params
+  currStepAnimationParams = new stepAnimationParams{pin,channel,period,steps};
+
+  //Declate animation loop used for this animation
+  auto stepAnimationLoop = [](void* p) {
+    //Cast void pointer to animation params
+    stepAnimationParams* params = (stepAnimationParams*)p;
+
+    //Get vals from params struct
+    float period = (float)(params->period);
+    float steps = (float)(params->steps);
+
+    //Start our animation loop!
+    int start = millis();
+    for(;;) {
+      //Calculate a new duty cycle
+      int now = millis();
+      float pos = fmod((float)(now-start), period)/period;
+      int dutyCycle = dutyCycle = 255.0 * round(pos*steps - 0.5) / (steps - 1);
+      
+      //Write the dutyCycle to the channel
+      ledcWrite(params->channel, dutyCycle);
+      //Do it again in 30ms
+      WAIT_MS(30);
+    }
+  };
+
+  //Create new animation task
+  xTaskCreatePinnedToCore(
+    stepAnimationLoop, "stepAnimationLoop", 10000, currStepAnimationParams, 1, &animationTask, 0
+  );
+
+  //Tell everyone we're animating now.
+  animating = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Animation utils
 
 //killAnimation stops any currently running animations.

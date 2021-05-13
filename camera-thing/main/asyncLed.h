@@ -24,4 +24,5 @@ class AsyncLED {
     void triangle(int period);
     void breathe(int period);
     void throb(int attackTime, int decayTime);
+    void step(int period, int steps);
 };
