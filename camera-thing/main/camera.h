@@ -3,8 +3,11 @@
 
 #include "esp_camera.h"
 
-//Utils
+//Setup method
 bool setupCamera();
 
 //Image getters
 bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen);
+
+//Debug utils
+void frameBufferToSerial(camera_fb_t* frameBuffer);

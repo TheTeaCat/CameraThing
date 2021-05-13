@@ -8,6 +8,10 @@
 /////////////////////////////////////////////////////////////////////////////
 // Config
 
+//Uncomment this to output the frame buffer to serial. Useful for debugging, but
+//will mess up the JPEG encoding if left defined.
+// #define DEBUG_IMG_TO_SERIAL
+
 #define CAM_PIN_PWDN    23
 #define CAM_PIN_RESET   19
 #define CAM_PIN_XCLK    33
@@ -94,8 +98,13 @@ bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
     return false;
   }
 
+  #ifdef DEBUG_IMG_TO_SERIAL
+    frameBufferToSerial(frameBuffer);
+  #endif
+
   //Compress frameBuffer to JPEG
   bool converted = frame2jpg(frameBuffer, 80, jpgBuffer, jpgLen);
+
   //return the frame buffer back to the driver for reuse
   esp_camera_fb_return(frameBuffer);
 
