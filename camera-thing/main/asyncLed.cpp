@@ -1,6 +1,6 @@
 // asyncLed.cpp
 // Defines a handy AsyncLED class for animating an LED without blocking the main
-// thread using PWM
+// thread. Uses PWM to make nice animations.
 
 #include <Arduino.h>
 #include "utils.h"
@@ -19,18 +19,21 @@ AsyncLED::AsyncLED(int p, int c) {
 /////////////////////////////////////////////////////////////////////////////
 // Basic utils
 
+//Kills any animations and turns the LED on
 void AsyncLED::on() {
   Serial.printf("[AsyncLED.on] [Pin %d] - Turning LED on\n", pin);
   killAnimation();
   ledcWrite(15, 255);
 }
 
+//Kills any animations and turns the LED off
 void AsyncLED::off(){
   Serial.printf("[AsyncLED.off] [Pin %d] - Turning LED off\n", pin);
   killAnimation();
   ledcWrite(15, 0);
 };
 
+//Kills any animations and sets the LED to a given brightness (0-255)
 void AsyncLED::set(int dutyCycle){
   Serial.printf("[AsyncLED.off] [Pin %d] - Turning LED off\n", pin);
   killAnimation();
@@ -39,7 +42,8 @@ void AsyncLED::set(int dutyCycle){
 
 /////////////////////////////////////////////////////////////////////////////
 // Blink animation
-// A blink animation cycles on->off->on with a delay between each switch
+// A blink animation cycles on->off->on with a delay between each switch like a
+// square wave
 
 struct blinkAnimationParams {
   int pin;
@@ -79,14 +83,14 @@ void AsyncLED::blink(int delay){
     blinkAnimationLoop, "blinkAnimationLoop", 10000, currBlinkAnimationParams, 1, &animationTask, 0
   );
 
-  //Tell everyone we're animating now.
+  //Tell everyone we're animating now
   animating = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Breathe animation
-// A breathing animation cycles on->off->on like blink but changes brightness by 
-// using PWM and a sine wave that loops every `period` milliseconds
+// Triangle animation
+// A triangle animation cycles off->on->off like blink but ramps up brightness 
+// linearly, then back down linearly over the given period
 
 struct triangleAnimationParams {
   int pin;
@@ -139,14 +143,14 @@ void AsyncLED::triangle(int period) {
     triangleAnimationLoop, "triangleAnimationLoop", 10000, currTriangleAnimationParams, 1, &animationTask, 0
   );
 
-  //Tell everyone we're animating now.
+  //Tell everyone we're animating now
   animating = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Breathe animation
-// A breathing animation cycles on->off->on like blink but changes brightness by 
-// using PWM and a sine wave that loops every `period` milliseconds
+// A breathing animation cycles off->on->off like triangle or blink, but ramps
+// up and down following a sine wave that loops every `period` milliseconds
 
 struct breatheAnimationParams {
   int pin;
@@ -194,17 +198,18 @@ void AsyncLED::breathe(int period) {
     breatheAnimationLoop, "breatheAnimationLoop", 10000, currBreatheAnimationParams, 1, &animationTask, 0
   );
 
-  //Tell everyone we're animating now.
+  //Tell everyone we're animating now
   animating = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Throb animation
-// A throbbing animation cycles on->off->on like breathe but has a different  
+// A throbbing animation cycles off->on->off like breathe but has a different  
 // attack (off->on) to decay (on->off) period, so it can seem less or more 
 // aggressive than the standard breathing by altering the ratio between the 
 // durations, and overall durations of these two attack and decay values.
-// `attack` and `decay` are both periods in milliseconds.
+// `attack` and `decay` are both periods in milliseconds. This animation is 
+// exactly the same as breathe when `attack` is the same as `delay`.
 
 struct throbAnimationParams {
   int pin;

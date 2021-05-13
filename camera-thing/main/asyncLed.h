@@ -3,14 +3,12 @@
 
 class AsyncLED {
   private:
-    //The pin of the LED
-    int pin;
-    int channel;
+    int pin; //The pin of the LED
+    int channel; //The PWM channel the LED is assigned to
 
-    //Animation magic
-    bool animating = false;
-    TaskHandle_t animationTask;
-    void killAnimation();
+    bool animating = false; //Flag for if an animation is running
+    TaskHandle_t animationTask; //Holds the task running the current animation
+    void killAnimation(); //Kills the current animation
 
   public:
     //Constructor
