@@ -20,7 +20,7 @@
 AsyncLED blueLED = AsyncLED(LED_BLUE, 14);
 
 //Initialize modem
-HardwareSerial *sim800lSerial = &Serial1;
+HardwareSerial *sim800lSerial = &Serial2;
 Adafruit_FONA sim800l = Adafruit_FONA(SIM800L_PWRKEY);
 
 bool setupGSM() {
