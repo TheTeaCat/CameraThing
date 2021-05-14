@@ -78,14 +78,14 @@ the logs as follows:
 
 [DEV] [TWITTER] - Tweeted: Test Tweet
 */
-func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
+func (t *tweeter) tweetWithImage(tweetBody string, image []byte) (*twitter.Tweet, error) {
 	//If client is nil, we just log it
 	if t.client == nil {
 		log.Printf(
 			"[DEV] [TWITTER] - Tweeted: %[1]v",
 			strings.ReplaceAll(tweetBody, "\n", "\\n"),
 		)
-		return nil
+		return nil, nil
 	}
 
 	//Upload our picture
@@ -95,7 +95,7 @@ func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 		if resp != nil {
 			log.Println(resp)
 		}
-		return errors.New(fmt.Sprintf(
+		return nil, errors.New(fmt.Sprintf(
 			"Failed to upload image, err: %[1]v",
 			err.Error(),
 		))
@@ -104,14 +104,14 @@ func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 	//@todo: Find place ID of nearby places to add as a placeID in the tweet.
 
 	//Make the tweet using the media ID
-	_, _, err = t.client.Statuses.Update(
+	tweetCreated, _, err := t.client.Statuses.Update(
 		tweetBody,
 		&twitter.StatusUpdateParams{
 			MediaIds: []int64{media.MediaID},
 		},
 	)
 	if err != nil {
-		return errors.New(fmt.Sprintf(
+		return nil, errors.New(fmt.Sprintf(
 			"Failed to tweet image, err: %[1]v",
 			err.Error(),
 		))
@@ -123,5 +123,5 @@ func (t *tweeter) tweetWithImage(tweetBody string, image []byte) error {
 		strings.ReplaceAll(tweetBody, "\n", "\\n"),
 	)
 
-	return nil
+	return tweetCreated, nil
 }

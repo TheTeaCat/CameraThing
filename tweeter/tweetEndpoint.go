@@ -166,7 +166,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Make tweet
-	err = myTweeter.tweetWithImage(tweetBody, bigImgBytesBuf.Bytes())
+	tweetMade, err := myTweeter.tweetWithImage(tweetBody, bigImgBytesBuf.Bytes())
 	if err != nil {
 		log.Printf("[500] [/tweet] - Failed to tweet image, err: %[1]v", err.Error())
 		w.Header().Set("Content-Type", "application/json")
@@ -176,10 +176,13 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Respond
+	response := map[string]string{"Tweet": tweetBody}
+	if tweetMade != nil {
+		response["TweetURL"] = "https://twitter.com/" + tweetMade.User.Name + "/status/" + tweetMade.IDStr
+
+	}
 	log.Printf("[201] [/tweet] - Successfully tweeted: %[1]v", strings.ReplaceAll(tweetBody, "\n", ""))
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{
-		"Tweet": tweetBody,
-	})
+	json.NewEncoder(w).Encode(response)
 }
