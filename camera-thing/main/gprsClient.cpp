@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "secrets.h"
 #include "utils.h"
 #include "asyncLed.h"
 
@@ -23,12 +24,6 @@ TinyGsmClient client(modem);
 #define SIM800L_RST    5
 #define SIM800L_POWER  23
 #define LED_BLUE  13
-
-//GPRS credentials
-//@todo: Move to secrets.h
-const char apn[] = "payandgo.o2.co.uk";
-const char gprsUser[] = "payandgo";
-const char gprsPass[] = "password";
 
 //Create LED instance
 AsyncLED blueLED = AsyncLED(LED_BLUE, 14);
@@ -67,8 +62,8 @@ bool setupGSM() {
   Serial.println(" success!");
 
   //Setup GPRS...
-  Serial.printf("Connecting to APN '%s'...", apn);
-  if (!modem.gprsConnect(apn, gprsUser, gprsPass)) {
+  Serial.printf("Connecting to APN '%s'...", APN);
+  if (!modem.gprsConnect(APN, GPRS_USER, GPRS_PASS)) {
     Serial.println(" fail :(");
     blueLED.blink(100);
     WAIT_MS(2000);
