@@ -25,7 +25,7 @@
 // Global variables
 
 //The pin of the LED
-int ledPin = 26;
+int ledPin = 15;
 //The button pin we're using
 int buttonPin = 25;
 
