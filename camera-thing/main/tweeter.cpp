@@ -19,6 +19,12 @@
     return setupWifiClient(60, 5);
   }
 #endif
+#ifdef APN
+  #include "gprsClient.h"
+  bool setupNetworkConn() {
+    return setupGPRSClient();
+  }
+#endif
 
 //checkTweeterAccessible queries the tweeter's /health endpoint and checks that
 //the response code provided is 200 OK within a given timeout, in milliseconds.

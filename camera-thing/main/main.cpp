@@ -53,19 +53,6 @@ void setup() {
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
 
-  //Setup GSM. This may take a while normally...
-  Serial.println("Attempting to setup GSM...");
-  bool gsmSuccess = setupGSM();
-  if (!gsmSuccess) {
-    Serial.println("Failed to setup GSM :(");
-    //Signal hardware failure
-    myLed.blink(100);
-    WAIT_MS(2000);
-    ESP.restart();
-  }
-  Serial.println("Successfully setup GSM!");
-
-
   //Setup wifi. This may take a while normally...
   Serial.println("Setting up network connection...");
   bool networkSuccess = setupNetworkConn();

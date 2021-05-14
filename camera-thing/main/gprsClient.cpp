@@ -1,21 +1,8 @@
 #include <Arduino.h>
+#include "gprsClient.h"
 #include "secrets.h"
 #include "utils.h"
 #include "asyncLed.h"
-
-#define TINY_GSM_MODEM_SIM800      // Modem is SIM800
-#define TINY_GSM_RX_BUFFER   1024  // Set RX buffer to 1Kb
-#include <TinyGsmClient.h>
-
-//Initialise modem
-#define SerialAT Serial2
-TinyGsm modem(SerialAT);
-// #include <StreamDebugger.h>
-// StreamDebugger debugger(SerialAT, Serial);
-// TinyGsm modem(debugger);
-
-//Initialise client
-TinyGsmClient client(modem);
 
 //TTGO T-Call pin definitions
 #define SIM800L_RX     26
@@ -28,8 +15,8 @@ TinyGsmClient client(modem);
 //Create LED instance
 AsyncLED blueLED = AsyncLED(LED_BLUE, 14);
 
-//setupGSM sets up the GPRS connection for the TinyGSM client.
-bool setupGSM() {
+//setupGPRSClient sets up the GPRS connection for the TinyGSM client.
+bool setupGPRSClient() {
   //Make blue LED breathe
   blueLED.breathe(1000);
 
