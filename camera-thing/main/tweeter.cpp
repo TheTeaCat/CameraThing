@@ -122,7 +122,7 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
     "POST /tweet?auth=" TWEETER_AUTH_TOKEN " HTTP/1.1\r\n"
     "Host: " TWEETER_HOST "\r\n"
     "Content-Type: multipart/form-data;boundary=\"boundary\"\r\n"
-    "Content-Length: 5000\r\n" //This is uh... good enough
+    "Content-Length: 39400\r\n" //Max possible size of 120*160*2B image + 1KB for everything else
     "Connection: close\r\n"
     "\r\n"
     "--boundary\r\n"
