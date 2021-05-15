@@ -10,7 +10,7 @@
 //Setup sets up the webClient that the queries to the tweeter service will be 
 //made by. It will setup a WiFi or GSM connection depending upon what values are
 //set in secrets.h
-#ifdef WIFISSID
+#ifdef WIFI_SSID
   #include "wifiClient.h"
   bool setupNetworkConn() {
     return setupWifiClient(60, 5);

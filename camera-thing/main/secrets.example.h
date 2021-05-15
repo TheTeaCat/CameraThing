@@ -1,6 +1,6 @@
 //Credentials for using the wifiClient in wifiClient.cpp
-#define WIFISSID "Put your SSID in here! :)"
-#define WIFIPASSWORD "Put your password in here! :)"
+#define WIFI_SSID "Put your SSID in here! :)"
+#define WIFI_PASS "Put your password in here! :)"
 
 //GPRS credentials
 #define APN "Put the APN of your provider here :)"

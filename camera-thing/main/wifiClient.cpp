@@ -1,10 +1,10 @@
 // wifiClient.cpp
 // Config and utils for connecting to a WiFi network
 
-//Include secrets.h so we can tell if WIFISSID is defined
+//Include secrets.h so we can tell if WIFI_SSID is defined
 #include "secrets.h"
 
-#ifdef WIFISSID
+#ifdef WIFI_SSID
   #include <WiFi.h>
   #include "utils.h"
   #include "esp_camera.h"
@@ -22,22 +22,22 @@
   //maxTrials * maxAttempts seconds to terminate at worst.
   bool setupWifiClient(int maxTrials, int maxAttempts) {
     //Return immediately if the apropriate config vars aren't set
-    #ifndef WIFISSID
-      Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFISSID not set.");
+    #ifndef WIFI_SSID
+      Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFI_SSID not set.");
       return false;
     #endif
-    #ifndef WIFIPASSWORD
-      Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFIPASSWORD not set.");
+    #ifndef WIFI_PASS
+      Serial.println("[setupWifi] - Couldn't connect to WiFi; WIFI_PASS not set.");
       return false;
     #endif
 
-    #if defined(WIFISSID) && defined(WIFIPASSWORD)
+    #if defined(WIFI_SSID) && defined(WIFI_PASS)
       //We try maxAttempts times to connect to WiFi before giving up
       for(int attempt = 0; attempt < maxAttempts; attempt++) {
-        Serial.printf("[setupWifi] - Trying to connect to '%s'\n", WIFISSID);
+        Serial.printf("[setupWifi] - Trying to connect to '%s'\n", WIFI_SSID);
         
         //Attempt to begin wifi conn
-        WiFi.begin(WIFISSID, WIFIPASSWORD);
+        WiFi.begin(WIFI_SSID, WIFI_PASS);
 
         //We allow each attempt to run for maxTrials seconds
         bool success = false;
@@ -58,14 +58,14 @@
 
         //If success, log it and return true
         if(success) {
-          Serial.printf("[setupWifi] - WiFi successfully connected to SSID: '%s'\n", WIFISSID);
+          Serial.printf("[setupWifi] - WiFi successfully connected to SSID: '%s'\n", WIFI_SSID);
           Serial.printf("[setupWifi] - Device IP: %s\n", ip2str(WiFi.localIP()));
           return true;
         }
       }
 
       //If we ran out of attempts, log and return false for fail
-      Serial.printf("[setupWifi] - WiFi failed to connect to SSID: '%s'\n", WIFISSID);
+      Serial.printf("[setupWifi] - WiFi failed to connect to SSID: '%s'\n", WIFI_SSID);
       return false;
     #endif
   }
