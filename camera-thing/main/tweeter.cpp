@@ -117,26 +117,62 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
     return false;
   }
 
+  //Construct request body
+  char *reqHead = 
+    "POST /tweet?auth=" TWEETER_AUTH_TOKEN " HTTP/1.1\r\n"
+    "Host: " TWEETER_HOST "\r\n"
+    "Content-Type: multipart/form-data;boundary=\"boundary\"\r\n"
+    "Content-Length: 5000\r\n" //This is uh... good enough
+    "Connection: close\r\n"
+    "\r\n"
+    "--boundary\r\n"
+    "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n"
+    "\r\n";
+  char *reqTail = 
+    "\r\n"
+    "--boundary--\r\n"
+    "\r\n";
+
   //Write request body
   Serial.println("[makeTweetRequest] - Writing request...");
-  webClient.print("POST /tweet?auth=" TWEETER_AUTH_TOKEN);
-  if (geolocationEnabled) {
-    //Only add lat&long to GET params if geolocationEnabled
-    webClient.printf("&lat=%02.5f&long=%02.5f", lat, lon);
-  }
-  webClient.print(" HTTP/1.1\r\n");
-  webClient.print("Host: " TWEETER_HOST "\r\n");
-  webClient.print("Content-Type: multipart/form-data;boundary=\"boundary\"\r\n");
-  webClient.printf("Content-Length: %d\r\n", (*jpgLen)+1000); //This is uh... good enough
-  webClient.print("Connection: close\r\n\r\n");
-  webClient.print("--boundary\r\n"
-                   "Content-Disposition: form-data; name=\"image\"; filename=\"Untitled.jpg\"\r\n"
-                   "\r\n");
-  int written = webClient.write(*jpgBuffer, *jpgLen);
-  webClient.print("\r\n--boundary--\r\n\r\n");
+  int headWritten = webClient.write((uint8_t*)reqHead, strlen(reqHead));
 
-  //Display JPEG bytes written and success in serial
-  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from JPEG\n", written, *jpgLen);
+  //Keep track of how many bytes we've written
+  int jpgWritten = 0;
+
+  //Max size of each chunk
+  const int maxChunkSize = 512;
+
+  //@todo: make this not get stuck together
+  while(true) {
+    //Figure out how many bytes remain to be written
+    int remainingBytes = *jpgLen - jpgWritten;
+
+    //Set the chunkSize to the min of maxChunkSize or the remaining bytes
+    int chunkSize = maxChunkSize;
+    if (remainingBytes < maxChunkSize) {
+      chunkSize = remainingBytes;
+    }
+
+    //Write up to chunkSize bytes
+    int written = webClient.write((*jpgBuffer)+jpgWritten, chunkSize);
+    Serial.printf("[makeTweetRequest] - Written %d bytes of JPEG; %d out of %d so far\n", written, *jpgLen, jpgWritten);
+
+    //Add the number of bytes written to the accumulator for logging later
+    jpgWritten += written;
+
+    //Break once we've written all the bytes!
+    if(jpgWritten >= *jpgLen) {
+      break;
+    }
+  }
+
+  int tailWritten = webClient.write((uint8_t*)reqTail, strlen(reqTail));
+
+  // //Display JPEG bytes written and success in serial
+  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from request head\n", headWritten, strlen(reqHead));
+  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from JPEG\n", jpgWritten, *jpgLen);
+  Serial.printf("[makeTweetRequest] - %d bytes out of %d written from request tail\n", tailWritten, strlen(reqTail));
   Serial.println("[makeTweetRequest] - Finished writing request");
 
   //Await response from server with timeout
