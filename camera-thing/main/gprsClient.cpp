@@ -16,16 +16,9 @@
   #define SIM800L_PWRKEY 4
   #define SIM800L_RST    5
   #define SIM800L_POWER  23
-  #define LED_BLUE  13
-
-  //Create LED instance
-  AsyncLED blueLED = AsyncLED(LED_BLUE, 14);
 
   //setupGPRSClient sets up the GPRS connection for the TinyGSM client.
   bool setupGPRSClient() {
-    //Make blue LED breathe
-    blueLED.breathe(1000);
-
     //Setup power
     pinMode(SIM800L_PWRKEY, OUTPUT);
     pinMode(SIM800L_RST, OUTPUT);
@@ -48,8 +41,6 @@
     Serial.print("Initializing modem...");
     if(!modem.restart()){
       Serial.println(" fail :(");
-      blueLED.blink(100);
-      WAIT_MS(2000);
       return false;
     }
     Serial.println(" success!");
@@ -58,14 +49,11 @@
     Serial.printf("Connecting to APN '%s'...", APN);
     if (!modem.gprsConnect(APN, GPRS_USER, GPRS_PASS)) {
       Serial.println(" fail :(");
-      blueLED.blink(100);
-      WAIT_MS(2000);
       return false;
     }
     Serial.println(" success!");
 
-    //Turn LED off and return true for success!
-    blueLED.off();
+    //Return true for success!
     return true;
   }
 #endif
