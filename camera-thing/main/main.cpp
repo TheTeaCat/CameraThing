@@ -147,14 +147,14 @@ void loop() {
     size_t jpgLen;
     bool gotJPEG = getJPEG(&jpgBuffer, &jpgLen);
 
-    //If we fail to get a frame buffer, signal an err and return.
+    //If we fail to get a frame buffer, signal an err and restart
     if (!gotJPEG || jpgLen == 0) {
       Serial.println("[loop] - Failed to get JPEG :(");
       myLed.blink(100); //blink(100) for hardware failure
       WAIT_MS(2000);
       myLed.off();
       delete jpgBuffer;
-      return;
+      ESP.restart();
     }
 
     //If we're mocking delays, delay to pretend it takes a while to get a
@@ -213,7 +213,7 @@ void loop() {
     //     WAIT_MS(2000);
     //     myLed.off();
     //     delete jpgBuffer;
-    //     return;
+    //     ESP.restart();
     //   }
 
     //   //Output geolocation to serial
