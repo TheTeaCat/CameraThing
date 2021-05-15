@@ -28,17 +28,17 @@
     digitalWrite(SIM800L_POWER, HIGH);
 
     //Give SIM800L 10 seconds to startup
-    Serial.println("Giving 10s startup time to SIM800L...");
+    Serial.println("[setupGPRSClient] - Giving 10s startup time to SIM800L...");
     WAIT_MS(10000);
 
     //Initialise SerialAT...
-    Serial.print("Starting SerialAT...");
+    Serial.print("[setupGPRSClient] - Starting SerialAT...");
     SerialAT.begin(4800, SERIAL_8N1, SIM800L_RX, SIM800L_TX);
     WAIT_MS(3000);
     Serial.println(" done :)");
 
     //Restart SIM800L...
-    Serial.print("Initializing modem...");
+    Serial.print("[setupGPRSClient] - Initializing modem...");
     if(!modem.restart()){
       Serial.println(" fail :(");
       return false;
@@ -46,7 +46,7 @@
     Serial.println(" success!");
 
     //Setup GPRS...
-    Serial.printf("Connecting to APN '%s'...", APN);
+    Serial.printf("[setupGPRSClient] - Connecting to APN '%s'...", APN);
     if (!modem.gprsConnect(APN, GPRS_USER, GPRS_PASS)) {
       Serial.println(" fail :(");
       return false;
