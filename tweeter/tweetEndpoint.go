@@ -116,26 +116,29 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	io.Copy(&imageBuffer, imageFile)
 	imageBytes := imageBuffer.Bytes()
 
+	//////////////////////////////////////////////////////////////////////
 	//Get image labels
 	labels, err := myRecogniser.recognise(imageBytes)
+	recogniserFailed := false //We still tweet if the recogniser fails.
 	if err != nil {
-		log.Printf("[500] [/tweet] - Image recognition failed, err: %[1]v", err.Error())
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode("Failed to recognise image")
-		return
+		log.Printf("[XXX] [/tweet] - Image recognition failed, err: %[1]v", err.Error())
+		recogniserFailed = true
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	//Construct a tweetBody of up to five labels followed by question marks
 	tweetBody := ""
-	for i := 0; i < 5 && i < len(labels); i++ {
-		tweetBody += strings.Title(labels[i].Label) + "? "
+	if !recogniserFailed {
+		for i := 0; i < 5 && i < len(labels); i++ {
+			tweetBody += strings.Title(labels[i].Label) + "? "
+		}
 	}
-	//If no labels were returned, say we've got no idea what it is
-	if len(labels) == 0 {
+	//If no labels were returned, or the tweeter otherwise failed, say we've got
+	//no idea what it is
+	if len(tweetBody) == 0 {
 		tweetBody = "I have no idea. "
 	}
+
 	//Add the location to the tweet if we have both lat and long
 	if longitudeProvided && latitudeProvided {
 		tweetBody += fmt.Sprintf("(%.5f,%.5f)", lat, long)
