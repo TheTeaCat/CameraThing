@@ -49,7 +49,7 @@ static camera_config_t camera_config = {
     .pin_pclk = CAM_PIN_PCLK,
 
     //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
-    .xclk_freq_hz = 10000000,
+    .xclk_freq_hz = 5000000,
     .ledc_timer = LEDC_TIMER_0,
     .ledc_channel = LEDC_CHANNEL_0,
 
@@ -103,7 +103,7 @@ bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
   #endif
 
   //Compress frameBuffer to JPEG
-  bool converted = frame2jpg(frameBuffer, 50, jpgBuffer, jpgLen);
+  bool converted = frame2jpg(frameBuffer, 65, jpgBuffer, jpgLen);
 
   //return the frame buffer back to the driver for reuse
   esp_camera_fb_return(frameBuffer);
