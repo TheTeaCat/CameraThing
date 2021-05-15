@@ -95,7 +95,7 @@ void setup() {
   // if (!gpsSuccess) {
   //   Serial.println("[setup] - Failed to setup GPS :(");
   //   //Signal hardware failure
-  //   myLed.blink(100);
+  //   myLed.flash(100);
   //   WAIT_MS(2000);
   //   ESP.restart();
   // }
@@ -107,7 +107,7 @@ void setup() {
   if (!cameraSuccess) {
     Serial.println("[setup] - Failed to setup camera :(");
     //Signal hardware failure
-    myLed.blink(100);
+    myLed.flash(100);
     WAIT_MS(2000);
     ESP.restart();
   }
@@ -119,8 +119,8 @@ void setup() {
     WAIT_MS(MOCKDELAY);
   #endif
 
-  //Turn LED off again now setup
-  myLed.off();
+  //Blink the LED now to signal the CameraThing is on
+  myLed.blink(4950,50);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ void loop() {
       Serial.println("[loop] - Button is pressed! Taking a picture...");
     } else {
       Serial.println("[loop] - Button is no longer pressed!");
-      myLed.off();
+      myLed.blink(4950,50);
     }
   }
 
@@ -156,7 +156,7 @@ void loop() {
     //If we fail to get a frame buffer, signal an err and restart
     if (!gotJPEG || jpgLen == 0) {
       Serial.println("[loop] - Failed to get JPEG :(");
-      myLed.blink(100); //blink(100) for hardware failure
+      myLed.flash(100); //flash(100) for hardware failure
       WAIT_MS(2000);
       myLed.off();
       delete jpgBuffer;
@@ -215,7 +215,7 @@ void loop() {
     //   //If there is some err getting the geolocation data, signal an err and 
     //   //return.
     //   if(!gotGeolocation) {
-    //     myLed.blink(100); //blink(100) for hardware failure
+    //     myLed.flash(100); //flash(100) for hardware failure
     //     WAIT_MS(2000);
     //     myLed.off();
     //     delete jpgBuffer;
@@ -267,8 +267,8 @@ void loop() {
     //////////////////////////////////////////////////////////////////////
     //Buttondown warning     
     //Start flashing quickly (will only stay on if the button is still pressed
-    //down; otherwise turned off in the next loop)
-    myLed.blink(50);
+    //down; otherwise turned back to blinking in the next loop)
+    myLed.flash(50);
   }
 
   //Give background processes some time

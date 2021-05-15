@@ -20,7 +20,8 @@ class AsyncLED {
     void set(int dutyCycle);
 
     //Animations
-    void blink(int delay);
+    void flash(int delay);
+    void blink(int offPeriod, int onPeriod);
     void triangle(int period);
     void breathe(int period);
     void throb(int attackTime, int decayTime);

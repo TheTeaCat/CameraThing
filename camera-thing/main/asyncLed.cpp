@@ -41,10 +41,10 @@ void AsyncLED::set(int dutyCycle){
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// Blink animation
-// A blink animation cycles on->off->on with a delay between each switch like a
+// Flash animation
+// A flash animation cycles on->off->on with a delay between each switch like a
 // square wave
-// An example of a blink animation:
+// An example of a flash animation:
 //     ___     ___     ___     ___     ___     ___     ___     ___     ___   
 //    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
 //    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
@@ -52,16 +52,16 @@ void AsyncLED::set(int dutyCycle){
 //    |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |  
 // ___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |___|   |__
 
-struct blinkAnimationParams {
+struct flashAnimationParams {
   int pin;
   int channel;
   int delay;
 };
 
-blinkAnimationParams* currBlinkAnimationParams;
+flashAnimationParams* currFlashAnimationParams;
 
-void AsyncLED::blink(int delay){
-  Serial.printf("[AsyncLED.blink] [Pin %d] - Blinking with %d ms delay\n", pin, delay);
+void AsyncLED::flash(int delay){
+  Serial.printf("[AsyncLED.flash] [Pin %d] - Flashing with %d ms delay\n", pin, delay);
 
   //If we're already animating, kill the current animation before starting a new 
   //one (we can't have two going at once!)
@@ -70,7 +70,61 @@ void AsyncLED::blink(int delay){
   }
 
   //Create animation params
-  currBlinkAnimationParams = new blinkAnimationParams{pin,channel,delay};
+  currFlashAnimationParams = new flashAnimationParams{pin,channel,delay};
+
+  //Declate animation loop used for this animation
+  auto flashAnimationLoop = [](void* p) {
+    //Cast void pointer to animation params
+    flashAnimationParams* params = (flashAnimationParams*)p;
+    //FINALLY, an async for loop!
+    for(;;) {
+      ledcWrite(params->channel, 255);
+      WAIT_MS(params->delay);
+      ledcWrite(params->channel, 0);
+      WAIT_MS(params->delay);
+    }
+  };
+
+  //Create new animation task
+  xTaskCreatePinnedToCore(
+    flashAnimationLoop, "flashAnimationLoop", 10000, currFlashAnimationParams, 1, &animationTask, 0
+  );
+
+  //Tell everyone we're animating now
+  animating = true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Blink animation
+// The same as the flash animation, but the on and off periods are different.
+// An example of a blink animation:
+//            __            __            __            __            __     
+//           |  |          |  |          |  |          |  |          |  |    
+//           |  |          |  |          |  |          |  |          |  |    
+//           |  |          |  |          |  |          |  |          |  |    
+//           |  |          |  |          |  |          |  |          |  |    
+// __________|  |__________|  |__________|  |__________|  |__________|  |____
+
+struct blinkAnimationParams {
+  int pin;
+  int channel;
+  int offPeriod;
+  int onPeriod;
+};
+
+blinkAnimationParams* currBlinkAnimationParams;
+
+void AsyncLED::blink(int offPeriod, int onPeriod){
+  Serial.printf("[AsyncLED.blink] [Pin %d] - Blinking with %d offPeriod and %d onPeriod\n", pin, offPeriod, onPeriod);
+
+  //If we're already animating, kill the current animation before starting a new 
+  //one (we can't have two going at once!)
+  if(animating) {
+    killAnimation();
+  }
+
+  //Create animation params
+  currBlinkAnimationParams = new blinkAnimationParams{pin,channel,offPeriod,onPeriod};
 
   //Declate animation loop used for this animation
   auto blinkAnimationLoop = [](void* p) {
@@ -79,9 +133,9 @@ void AsyncLED::blink(int delay){
     //FINALLY, an async for loop!
     for(;;) {
       ledcWrite(params->channel, 255);
-      WAIT_MS(params->delay);
+      WAIT_MS(params->onPeriod);
       ledcWrite(params->channel, 0);
-      WAIT_MS(params->delay);
+      WAIT_MS(params->offPeriod);
     }
   };
 
@@ -96,7 +150,7 @@ void AsyncLED::blink(int delay){
 
 /////////////////////////////////////////////////////////////////////////////
 // Triangle animation
-// A triangle animation cycles off->on->off like blink but ramps up brightness 
+// A triangle animation cycles off->on->off like flash but ramps up brightness 
 // linearly, then back down linearly over the given period
 // An example of a triangle animation:
 //           .'.                   .'.                   .'.                 
@@ -163,7 +217,7 @@ void AsyncLED::triangle(int period) {
 
 /////////////////////////////////////////////////////////////////////////////
 // Breathe animation
-// A breathing animation cycles off->on->off like triangle or blink, but ramps
+// A breathing animation cycles off->on->off like triangle or flash, but ramps
 // up and down following a 1-cos wave that loops every `period` milliseconds
 // An example of a breathe animation:
 //               _.-'-._                           _.-'-._                    
@@ -377,13 +431,18 @@ void AsyncLED::killAnimation() {
   }
 
   //Dispose of any animation params if they're set
+  if (currFlashAnimationParams != nullptr) {
+    Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting flash animation params\n", pin);
+    delete(currFlashAnimationParams);
+    currFlashAnimationParams = nullptr;
+  }
   if (currBlinkAnimationParams != nullptr) {
     Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting blink animation params\n", pin);
     delete(currBlinkAnimationParams);
     currBlinkAnimationParams = nullptr;
   }
   if (currTriangleAnimationParams != nullptr) {
-    Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting blink animation params\n", pin);
+    Serial.printf("[AsyncLED.killAnimation] [Pin %d] - Deleting triangle animation params\n", pin);
     delete(currTriangleAnimationParams);
     currTriangleAnimationParams = nullptr;
   }
