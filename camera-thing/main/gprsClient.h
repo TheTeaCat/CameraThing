@@ -1,5 +1,6 @@
 // wifiManager.h
 // Exports the utils for connecting to 2G
+
 #ifndef GPRS_CLIENT_USED
   #define GPRS_CLIENT_USED
 

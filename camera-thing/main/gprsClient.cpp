@@ -1,4 +1,9 @@
+// gprsClient.cpp
+// Config and utils for connecting to a 2G network
+
+//Include secrets.h so we can tell if APN is defined
 #include "secrets.h"
+
 #ifdef APN
   #include <Arduino.h>
   #include "gprsClient.h"

@@ -1,5 +1,6 @@
-// wifiManager.h
+// wifiClient.h
 // Exports the utils for connecting to a WiFi network
+
 #ifndef WIFI_CLIENT_USED
   #define WIFI_CLIENT_USED
 

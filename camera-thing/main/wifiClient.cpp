@@ -1,7 +1,9 @@
-// wifiManager.cpp
-// Config and utils for connecting to a wifi connection to test sending data to
-// the tweeter service
+// wifiClient.cpp
+// Config and utils for connecting to a WiFi network
+
+//Include secrets.h so we can tell if WIFISSID is defined
 #include "secrets.h"
+
 #ifdef WIFISSID
   #include <WiFi.h>
   #include "utils.h"
