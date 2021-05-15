@@ -58,17 +58,17 @@ void setup() {
   //We only setupNetworkConn on startup if we're using WiFI; 2G has to be done 
   //before every request.
   #ifdef WIFI_SSID
-  //Setup wifi. This may take a while normally...
-  Serial.println("Setting up network connection...");
-  bool networkSuccess = setupNetworkConn();
-  if (!networkSuccess) {
-    Serial.println("Failed to connect to network :(");
-    //Signal network failure
-    myLed.step(1000,4);
-    WAIT_MS(3000);
-    ESP.restart();
-  }
-  Serial.println("Set up network connection!");
+    //Setup wifi. This may take a while normally...
+    Serial.println("Setting up network connection...");
+    bool networkSuccess = setupNetworkConn();
+    if (!networkSuccess) {
+      Serial.println("Failed to connect to network :(");
+      //Signal network failure
+      myLed.step(1000,4);
+      WAIT_MS(3000);
+      ESP.restart();
+    }
+    Serial.println("Set up network connection!");
   #endif
 
   //Check tweeter service is available. This may also take a while normally...
@@ -165,7 +165,7 @@ void loop() {
     #endif
 
     //Output success
-    Serial.println("[Loop] - Got JPEG from camera");
+    Serial.printf("[Loop] - Got JPEG from camera of %d bytes\n", jpgLen);
 
     //Turn the LED off now the camera is done
     myLed.off();
