@@ -120,7 +120,7 @@ void setup() {
   #endif
 
   //Blink the LED now to signal the CameraThing is on
-  myLed.blink(4950,50);
+  myLed.blink(2950,50);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ void loop() {
       Serial.println("[loop] - Button is pressed! Taking a picture...");
     } else {
       Serial.println("[loop] - Button is no longer pressed!");
-      myLed.blink(4950,50);
+      myLed.blink(2950,50);
     }
   }
 
