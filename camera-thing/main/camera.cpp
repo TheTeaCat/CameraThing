@@ -12,22 +12,22 @@
 //will mess up the JPEG encoding if left defined.
 // #define DEBUG_IMG_TO_SERIAL
 
-#define CAM_PIN_PWDN    23
-#define CAM_PIN_RESET   19
-#define CAM_PIN_XCLK    33
-#define CAM_PIN_SIOD    12
-#define CAM_PIN_SIOC    13
-#define CAM_PIN_D7      36
-#define CAM_PIN_D6      15
-#define CAM_PIN_D5       4
+#define CAM_PIN_PWDN    -1 //Optional
+#define CAM_PIN_RESET   -1 //Optional
+#define CAM_PIN_XCLK    25
+#define CAM_PIN_SIOD     2
+#define CAM_PIN_SIOC    15
+#define CAM_PIN_D7      19
+#define CAM_PIN_D6      33
+#define CAM_PIN_D5      21
 #define CAM_PIN_D4      32
-#define CAM_PIN_D3       5
-#define CAM_PIN_D2      14
-#define CAM_PIN_D1      18
-#define CAM_PIN_D0      22
-#define CAM_PIN_VSYNC   34
-#define CAM_PIN_HREF    27
-#define CAM_PIN_PCLK    39
+#define CAM_PIN_D3      22
+#define CAM_PIN_D2      35
+#define CAM_PIN_D1      23
+#define CAM_PIN_D0      34
+#define CAM_PIN_VSYNC    0
+#define CAM_PIN_HREF    14
+#define CAM_PIN_PCLK    18
 
 static camera_config_t camera_config = {
     .pin_pwdn  = CAM_PIN_PWDN,
