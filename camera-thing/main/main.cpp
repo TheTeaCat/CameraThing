@@ -72,16 +72,22 @@ void setup() {
   #endif
 
   //Check tweeter service is available. This may also take a while normally...
-  Serial.println("[setup] - Checking tweeter service is accessible...");
-  bool tweeterSuccess = checkTweeterAccessible(60000);
-  if (!tweeterSuccess) {
-    Serial.println("[setup] - Failed to check tweeter service health :(");
-    //Signal network failure
-    myLed.step(1000,4);
-    WAIT_MS(3000);
-    ESP.restart();
-  }
-  Serial.println("[setup] - Tweeter is accessible!");
+  //It's not absolutely neccessary to do this, but a good idea if you want to be
+  //certain that your images should upload when you take them. It can be 
+  //disabled by defining FAST_STARTUP.
+  #define FAST_STARTUP
+  #ifndef FAST_STARTUP
+    Serial.println("[setup] - Checking tweeter service is accessible...");
+    bool tweeterSuccess = checkTweeterAccessible(60000);
+    if (!tweeterSuccess) {
+      Serial.println("[setup] - Failed to check tweeter service health :(");
+      //Signal network failure
+      myLed.step(1000,4);
+      WAIT_MS(3000);
+      ESP.restart();
+    }
+    Serial.println("[setup] - Tweeter is accessible!");
+  #endif
 
   //Setup GPS. Should be pretty fast...
   // Serial.println("[setup] - Setting up GPS...");
