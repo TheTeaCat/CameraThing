@@ -27,6 +27,15 @@
 //the response code provided is 200 OK within a given timeout, in milliseconds.
 //It returns false for fail, true for success.
 bool checkTweeterAccessible(int timeout) {
+  //If we're using GPRS we need to restart the SIM800L every time
+  #ifdef APN
+    bool setupGPRS = setupNetworkConn();
+    if (!setupGPRS) {
+      Serial.println("[checkTweeterAccessible] - Failed to setup GPRS connection :(");
+      return false;
+    }
+  #endif
+
   //Connect to tweeter. If fails to connect, log & return false for fail
   Serial.printf("[checkTweeterAccessible] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
   if (!webClient.connect(TWEETER_HOST, TWEETER_PORT)) {
@@ -92,6 +101,15 @@ bool checkTweeterAccessible(int timeout) {
 //false for fail, true for success. Pointers to the JPEG data are passed into
 //this function to save memory.
 bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
+  //If we're using GPRS we need to restart the SIM800L every time
+  #ifdef APN
+    bool setupGPRS = setupNetworkConn();
+    if (!setupGPRS) {
+      Serial.println("[checkTweeterAccessible] - Failed to setup GPRS connection :(");
+      return false;
+    }
+  #endif
+
   //Connect to tweeter
   Serial.printf("[makeTweetRequest] - Connecting to %s:%d...\n", TWEETER_HOST, TWEETER_PORT);
   if (!webClient.connect(TWEETER_HOST, TWEETER_PORT)) {

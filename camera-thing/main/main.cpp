@@ -55,6 +55,9 @@ void setup() {
   //Setup pin for button
   pinMode(buttonPin, INPUT_PULLUP);
 
+  //We only setupNetworkConn on startup if we're using WiFI; 2G has to be done 
+  //before every request.
+  #ifdef WIFI_SSID
   //Setup wifi. This may take a while normally...
   Serial.println("Setting up network connection...");
   bool networkSuccess = setupNetworkConn();
@@ -66,6 +69,7 @@ void setup() {
     ESP.restart();
   }
   Serial.println("Set up network connection!");
+  #endif
 
   //Check tweeter service is available. This may also take a while normally...
   Serial.println("Checking tweeter service is accessible...");
