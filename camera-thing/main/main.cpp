@@ -24,9 +24,9 @@
 // Global variables
 
 //The pin of the LED
-int ledPin = 15;
+int ledPin = 12;
 //The button pin we're using
-int buttonPin = 25;
+int buttonPin = 13;
 
 //Whether the button is currently down
 bool buttonDown = false;
