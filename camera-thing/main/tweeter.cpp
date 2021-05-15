@@ -11,10 +11,7 @@
 //made by. It will setup a WiFi or GSM connection depending upon what values are
 //set in secrets.h
 #ifdef WIFISSID
-  #include <WiFi.h>
   #include "wifiClient.h"
-  WiFiClient webClient;
-
   bool setupNetworkConn() {
     return setupWifiClient(60, 5);
   }
