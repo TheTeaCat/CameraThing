@@ -8,7 +8,6 @@
 #include "geolocate.h"
 #include "tweeter.h"
 #include "asyncLed.h"
-#include "gprsClient.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Debugging flags
