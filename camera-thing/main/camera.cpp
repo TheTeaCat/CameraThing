@@ -103,7 +103,7 @@ bool getJPEG(uint8_t** jpgBuffer, size_t* jpgLen){
   #endif
 
   //Compress frameBuffer to JPEG
-  bool converted = frame2jpg(frameBuffer, 80, jpgBuffer, jpgLen);
+  bool converted = frame2jpg(frameBuffer, 50, jpgBuffer, jpgLen);
 
   //return the frame buffer back to the driver for reuse
   esp_camera_fb_return(frameBuffer);
