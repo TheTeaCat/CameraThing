@@ -1,10 +1,33 @@
 # Tweeter
 
-The tweeter is a service which is intended to run alongside an instance of [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/). Its purpose is to take images and geolocations from the CameraThing and create tweets from them on the CameraThing's twitter account, [@CameraThing](https://twitter.com/CameraThing).
+The tweeter is a service which is intended to run alongside an instance of [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/). Its purpose is to take images from the CameraThing and create tweets from them on the CameraThing's twitter account, [@CameraThing](https://twitter.com/CameraThing). 
+
+
+
+![Tweeter Flowchart](./docs/imgs/flowchart.png)
+
+
+
+## Development and Deployment
+
+Development and deployment are documented in the `README.md` at the root of this project as the tweeter is a service intended to run alongside an instance of `go-tensorflow-image-recognition`.
 
 
 
 ## API
+
+### /health
+
+A `GET` request should be made to this endpoint.
+
+The purpose of this endpoint is to return a response that reads `I'm Healthy!`, which is useful for the CameraThing to be able to check it has an internet connection, and just generally checking that the tweeter service is accessible on the web.
+
+```bash
+curl "localhost:8080/health"
+"I'm healthy!"
+```
+
+
 
 ### /tweet
 
@@ -20,17 +43,17 @@ For example, the following curl request:
 
 ```bash
 curl "localhost:8080/tweet?auth=dev&lat=53.36097329965131&long=-1.6899902029658576" -F 'image=@./cat7.jpg'
-{"Tweet":"Mongoose? Wombat? Wallaby? Weasel? Chesapeake Bay Retriever? (53.36097,-1.68999)"}
+{"Tweet":"Mongoose? Wombat? Wallaby? Weasel? Chesapeake Bay Retriever? (53.36097,-1.68999)","TweetURL":"https://twitter.com/CameraThing/status/1394257828580372480"}
 ```
 
 Or without geolocation:
 
 ```bash
 curl "localhost:8080/tweet?auth=dev" -F 'image=@./cat7.jpg'
-{"Tweet":"Mongoose? Wombat? Wallaby? Weasel? Chesapeake Bay Retriever? "}
+{"Tweet":"Mongoose? Wombat? Wallaby? Weasel? Chesapeake Bay Retriever?","TweetURL":"https://twitter.com/CameraThing/status/1394258066116390915"}
 ```
 
-The response contains the text used in the tweet created for that image. The request may take a while as the image is processed by [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/) to create the tweet body, and post processed before the client can be responded to. The server does not return early so that the device can display if uploading a tweet failed for any reason, even server-side.
+The response contains the text used in the tweet created for that image, and the url to the tweet that was created. The request may take a while as the image is processed by [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/) to create the tweet body, and post processed before the client can be responded to. The server does not return early so that the device can display if uploading a tweet failed for any reason, even server-side, and potentially perform some action with the tweet data (e.g. send a text containing a link to the tweet).
 
 
 
@@ -79,3 +102,26 @@ Your Twitter Consumer Key.
 #### `TWITTER_CONSUMER_SECRET`
 
 Your Twitter Consumer Secret.
+
+
+
+### Example Setups
+
+#### Development
+
+```
+ENV=DEV
+```
+
+#### Production
+
+```
+ENV=PROD
+RECOGNISER_ENDPOINT=http://imagerec:8080/recognize
+TWEET_AUTH_TOKEN=A random key of your choosing
+TWITTER_CONSUMER_KEY=...
+TWITTER_CONSUMER_SECRET=...
+TWITTER_ACCESS_TOKEN=...
+TWITTER_ACCESS_TOKEN_SECRET=...
+```
+
