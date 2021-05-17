@@ -181,7 +181,7 @@ func (te *tweetEndpoint) handle(w http.ResponseWriter, r *http.Request) {
 	//Respond
 	response := map[string]string{"Tweet": tweetBody}
 	if tweetMade != nil {
-		response["TweetURL"] = "https://twitter.com/" + tweetMade.User.Name + "/status/" + tweetMade.IDStr
+		response["TweetURL"] = "https://twitter.com/" + tweetMade.User.ScreenName + "/status/" + tweetMade.IDStr
 
 	}
 	log.Printf("[201] [/tweet] - Successfully tweeted: %[1]v", strings.ReplaceAll(tweetBody, "\n", ""))
