@@ -120,6 +120,7 @@ If I don't immediately disassemble my CameraThing to make something else, I migh
 4. Expand the IO of the ESP32 so I can use a SIM800L and a GPS featherwing at the same time.
 5. Swap out the InceptionV3 tensorflow model for a more accurate, or at least funnier one.
 6. Do some more image processing server-side to correct for white balance in particular.
+7. Make the CameraThing send me text messages when it successfully makes a tweet containing a link to the tweet that was created.
 
 
 
