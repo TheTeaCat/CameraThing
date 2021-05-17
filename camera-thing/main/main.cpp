@@ -78,6 +78,7 @@ void setup() {
     Serial.println("[setup] - Tweeter is accessible!");
   #endif
 
+  // !!! Currently not used, see FIRMWARE.md !!!
   //Setup GPS. Should be pretty fast...
   // Serial.println("[setup] - Setting up GPS...");
   // bool gpsSuccess = setupGPS();
@@ -159,6 +160,7 @@ void loop() {
     float lat; float lon;
     bool geolocationEnabled = false;
 
+    // !!! Currently not used, see FIRMWARE.md !!!
     // //Give the user 2.4 seconds to hold the button down to disable geolocation
     // Serial.println("[loop] - Getting geolocation preference from user...");
 
