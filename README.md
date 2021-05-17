@@ -8,7 +8,7 @@ Behold!
 
 
 
-Details on how to construct a CameraThing can be found in `/camera-thing`.
+Details on the CameraThing can be found in `/camera-thing`.
 
 Details on the cloud services on which the CameraThing depends can be found below, with more details in each service's subdirectory.
 
