@@ -2,9 +2,15 @@
 
 The IoT device!
 
-This document provides an overview of how to use the device.
+This document provides an overview of what the device does, and how to use it.
 
 For how to build the device, you'll want to see [HARDWARE.md](./HARDWARE.md); and to write the firmware to it, you'll want to see [FIRMWARE.md](./FIRMWARE.md).
+
+
+
+## What does it do?
+
+The CameraThing takes a picture from the OV7670 module, JPEG compresses it, (optionally) gets a geolocation from a GPS featherwing if this has been set up, then uploads the image and geolocation to the tweeter service either over a 2G mobile internet connection or a WiFi connection (whichever has been setup when the firmware was flashed to the device).
 
 
 
