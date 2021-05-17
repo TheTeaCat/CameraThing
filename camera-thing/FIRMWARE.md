@@ -72,7 +72,7 @@ The config for [TinyGsm](https://github.com/vshymanskyy/TinyGSM) are defined in 
 
 | Identifier            | Value                                                        |
 | --------------------- | ------------------------------------------------------------ |
-| TINY_GSM_MODEM_SIM800 |                                                              |
+| TINY_GSM_MODEM_SIM800 | None; this is a flag to state which GPRS chip we're using. In this case, it's a SIM800L. |
 | TINY_GSM_RX_BUFFER    | How big the buffer for receiving bytes from the SIM800L module should be |
 | SerialAT              | The Serial connection that should be used for the TinyGsm modem |
 
