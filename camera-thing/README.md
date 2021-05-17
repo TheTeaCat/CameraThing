@@ -8,12 +8,6 @@ For how to build the device, you'll want to see [HARDWARE.md](./HARDWARE.md); an
 
 
 
-@todo
-
-! [Add a picture of the CameraThing] ()
-
-
-
 ## User Interface
 
 The UI for the CameraThing is simple. It consists of: a button, *and* an LED!
