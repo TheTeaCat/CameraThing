@@ -13,17 +13,6 @@
 //#include "geolocate.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// Debugging flags
-
-//In order to model the behaviour under less than optimal circumstances 
-//(particularly as this is using a cellular connection), MOCKDELAY can be set
-//to add a number of WAIT_MS() calls in places where there are operations that
-//_could_ take a considerable amount of time. The delays applied are the value
-//of MOCKDELAY in ms, for example MOCKDELAY=1000 would apply delays of 1 second.
-//All the instances of MOCKDELAY being used should occur in this file, main.cpp.
-// #define MOCKDELAY 2500
-
-/////////////////////////////////////////////////////////////////////////////
 // Global variables
 
 //The pin of the LED
@@ -113,12 +102,6 @@ void setup() {
   }
   Serial.println("[setup] - Set up camera!");
 
-  //If we're mocking delays, add MOCKDELAY ms to the startup time.
-  #ifdef MOCKDELAY
-    Serial.printf("[MOCKDELAY] - Mocking a longer setup time by waiting %d ms...\n", MOCKDELAY);
-    WAIT_MS(MOCKDELAY);
-  #endif
-
   //Blink the LED now to signal the CameraThing is on
   myLed.blink(2950,50);
 }
@@ -163,13 +146,6 @@ void loop() {
       ESP.restart();
     }
 
-    //If we're mocking delays, delay to pretend it takes a while to get a
-    //frame buffer from the camera module
-    #ifdef MOCKDELAY
-      Serial.printf("[MOCKDELAY] - Mocking a slower camera by waiting %d ms...\n", MOCKDELAY);
-      WAIT_MS(MOCKDELAY);
-    #endif
-
     //Output success
     Serial.printf("[loop] - Got JPEG from camera of %d bytes\n", jpgLen);
 
@@ -205,13 +181,6 @@ void loop() {
     //   //Get geolocation with geolocate() function
     //   bool gotGeolocation = geolocate(&lat, &lon, 1000);
 
-    //   //If we're mocking delays, delay to pretend it takes a while to get a 
-    //   //geolocation from the GPS featherwing
-    //   #ifdef MOCKDELAY
-    //     Serial.printf("[MOCKDELAY] - Mocking a slower GPS by waiting %d ms...\n", MOCKDELAY);
-    //     WAIT_MS(MOCKDELAY);
-    //   #endif
-
     //   //If there is some err getting the geolocation data, signal an err and 
     //   //return.
     //   if(!gotGeolocation) {
@@ -236,13 +205,6 @@ void loop() {
 
     //Upload the information to the tweet service
     bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
-
-    //If we're mocking delays, delay to pretend it takes a while to send the
-    //data to the tweeter service
-    #ifdef MOCKDELAY
-      Serial.printf("[MOCKDELAY] - Mocking a slower tweet response by waiting %d ms...\n", MOCKDELAY);
-      WAIT_MS(MOCKDELAY);
-    #endif
 
     //If there is some err getting the data to the tweeter, signal an err and 
     //return.
