@@ -27,7 +27,9 @@ All the `#defines` are detailed here.
 
 ### Hardware Config
 
-There are a number of identifiers that need to be defined to describe the pinout used by your CameraThing.
+There are a number of identifiers that need to be defined to describe the pinout used by your CameraThing. Configuring these incorrectly can lead to the LED signalling hardware or network failures, detailed in `README.md`.
+
+
 
 #### `camera.cpp`
 
