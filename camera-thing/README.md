@@ -6,11 +6,13 @@ This document provides an overview of what the device does, and how to use it.
 
 For how to build the device, you'll want to see [HARDWARE.md](./HARDWARE.md); and to write the firmware to it, you'll want to see [FIRMWARE.md](./FIRMWARE.md).
 
+You can see a serial transcript in [SERIAL_TRANSCRIPT.md](.SERIAL_TRANSCRIPT.md).
+
 
 
 ## What does it do?
 
-The CameraThing takes a picture from the OV7670 module, JPEG compresses it, (optionally) gets a geolocation from a GPS featherwing if this has been set up, then uploads the image and geolocation to the tweeter service either over a 2G mobile internet connection or a WiFi connection (whichever has been setup when the firmware was flashed to the device).
+The CameraThing takes a picture from the OV7670 module, JPEG compresses it, (optionally) gets a geolocation from a GPS featherwing if this has been set up (see the footnotes of [FIRMWARE.md](./FIRMWARE.md)), then uploads the image and geolocation to the tweeter service either over a 2G mobile internet connection or a WiFi connection (whichever has been setup when the firmware was flashed to the device).
 
 
 
@@ -28,10 +30,10 @@ Startup may fail for four reasons:
 
 1. Setting up the GPS module fails (probably bad wiring). This will trigger a [hardware failure animation](#hardware-failure-animation) before restarting the CameraThing.
 2. Setting up the camera fails (also probably bad wiring, or unsupported camera config - too high resolution/unsupported colour type). This will trigger a [hardware failure animation](#hardware-failure-animation) before restarting the CameraThing.
-3. Connecting to WiFi fails (this will take a long time as up to 5 attempts are made, each lasting 1 minute). This should only happen if the network credentials are invalid or the WiFi network specified couldn't be found. This will trigger a [network failure animation](#network-failure-animation) before restarting the CameraThing.
+3. Connecting to WiFi fails (this will take a long time as up to 5 attempts are made, each lasting 1 minute) or connecting to 2G fails - whichever is setup. This should only happen if the network credentials are invalid or the network specified couldn't be found. This will trigger a [network failure animation](#network-failure-animation) before restarting the CameraThing.
 4. The CameraThing couldn't contact the tweeter service's `/health` endpoint, or the tweeter service's `/health` endpoint returned a response code other than `200 OK`. This could happen if the tweeter service is down, or having difficulty at the moment. This will trigger a [network failure animation](#network-failure-animation) before restarting the CameraThing.
 
-If everything goes well, the LED should just happily breathe for a few seconds while all the above runs through. Once it's finished, the LED is extinguished.
+If everything goes well, the LED should just happily breathe for a few seconds while all the above runs through. Once it's finished, the LED blinks for 50 milliseconds every 3 seconds to indicate that it is on.
 
 
 
@@ -112,7 +114,7 @@ In the case of a hardware failure, it's probably best to just find a computer an
 
 These are indicated by a [network failure animation](#network-failure-animation).
 
-If the device is saying there's a network failure, then the first thing to check is that your WiFi network is working - if you're using a mobile hotspot from your phone, has your phone just ran out of battery or turned its hotspot off?
+If the device is saying there's a network failure, then if you're using a WiFi connection the first thing to check is that your WiFi network is working - if you're using a mobile hotspot from your phone, has your phone just ran out of battery or turned its hotspot off?
 
 The next possibility is that your tweeter service has died or moved, which you can check by going to its `/health` endpoint in your browser to check it still says `"I'm Healthy!"`.
 
