@@ -45,6 +45,8 @@ Typical user flow for taking an image is as follows:
 
 Incredible
 
+[Here's a video](https://www.youtube.com/watch?v=gqYyUVmTIf0).
+
 
 
 The state of the device is then communicated through a single LED, using a number of animations defined in `main/asyncLed.cpp`.
