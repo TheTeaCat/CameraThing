@@ -1,6 +1,6 @@
 # Hardware
 
-This document details how to put together your own CameraThing.
+This document details how to put together your own CameraThing, without a GPS featherwing (see the footnotes of [FIRMWARE.md](./FIRMWARE.md) for why).
 
 You'll then need to read [FIRMWARE.md](./FIRMWARE.md) to transform it from a pile of buttons and wires into an actual CameraThing.
 
@@ -16,7 +16,7 @@ To make one CameraThing you will need:
 - A button.
 - An LED. It doesn't have to be a comically large pink one, but this is preferred.
 - A 230 ohm resistor.
-- A breadboard.
+- A breadboard (I used a small one with 30 rows and 10 columns, split down the middle, a-e & f-j).
 - A lot of jumper wires (preferably some of them still stuck together to use for the camera).
 
 
@@ -80,4 +80,4 @@ The full pinout I used on my CameraThing is as follows:
 
 ![Guts of the CameraThing](./docs/imgs/camera_thing_guts.jpg)
 
-**Note:** The TTGO T-CALL was too wide to fit on both of the breadboards i had.
+**Note:** The TTGO T-CALL was too wide to fit on both of the breadboards i had. I realise as writing this that I could have just put two breadboards next to each other, but everyone's an expert in hindsight.
