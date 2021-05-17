@@ -2,6 +2,8 @@
 
 The tweeter is a service which is intended to run alongside an instance of [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition/). Its purpose is to take images from the CameraThing and create tweets from them on the CameraThing's twitter account, [@CameraThing](https://twitter.com/CameraThing). 
 
+The tweeter also currently does some small image post-processing; it upscales the image from the CameraThing without interpolation to be 1280px wide without any interpolation so when people look at the images on twitter, their phones don't attempt to interpolate and make the images look all blurry - I think the hard edges between pixels look funnier.
+
 
 
 ![Tweeter Flowchart](./docs/imgs/flowchart.png)
