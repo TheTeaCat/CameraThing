@@ -6,7 +6,7 @@ This document provides an overview of what the device does, and how to use it.
 
 For how to build the device, you'll want to see [HARDWARE.md](./HARDWARE.md); and to write the firmware to it, you'll want to see [FIRMWARE.md](./FIRMWARE.md).
 
-You can see a serial transcript in [SERIAL_TRANSCRIPT.md](.SERIAL_TRANSCRIPT.md).
+You can see a serial transcript in [SERIAL_TRANSCRIPT.md](./SERIAL_TRANSCRIPT.md).
 
 
 
