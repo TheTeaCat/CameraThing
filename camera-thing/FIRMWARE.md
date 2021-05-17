@@ -15,7 +15,7 @@ pio run -t upload -t monitor
 
 I had some permissions issues with `/dev/ttyUSB0` so I made a simple bash script, `go.sh` which fixes that and runs `pio run -t upload -t monitor` for me.
 
-You can have a sample of healthy serial output in `SERIAL_TRANSCRIPT..md.
+You can have a sample of healthy serial output in [SERIAL_TRANSCRIPT.md](./SERIAL_TRANSCRIPT.md).
 
 
 
@@ -27,7 +27,7 @@ All the `#defines` are detailed here.
 
 ### Hardware Config
 
-There are a number of identifiers that need to be defined to describe the pinout used by your CameraThing. Configuring these incorrectly can lead to the LED signalling hardware or network failures, detailed in `README.md`.
+There are a number of identifiers that need to be defined to describe the pinout used by your CameraThing. Configuring these incorrectly can lead to the LED signalling hardware or network failures, detailed in [README.md](./README.md).
 
 
 
