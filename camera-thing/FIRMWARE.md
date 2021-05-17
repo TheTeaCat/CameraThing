@@ -15,6 +15,8 @@ pio run -t upload -t monitor
 
 I had some permissions issues with `/dev/ttyUSB0` so I made a simple bash script, `go.sh` which fixes that and runs `pio run -t upload -t monitor` for me.
 
+You can have a sample of healthy serial output in `SERIAL_TRANSCRIPT..md.
+
 
 
 ## Preprocessor Instructions
