@@ -137,4 +137,6 @@ If I don't immediately disassemble my CameraThing to make something else, I migh
 
 [TinyGSM](https://github.com/vshymanskyy/TinyGSM), the library I used for the SIM800L module.
 
+Tin Rabzelj and contributors, for creating [go-tensorflow-image-recognition](https://github.com/tinrab/go-tensorflow-image-recognition).
+
 Also, thanks to my flatmate Edward Hails for the nice button.
