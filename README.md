@@ -118,11 +118,12 @@ If I don't immediately disassemble my CameraThing to make something else, I migh
 
 1. Connect all the modules properly (not using jumper wires).
 2. Build a better housing for it - the camera doesn't sit straight stuck to the side of a cardboard box so it's hard to frame photos up properly. If it was mounted properly then it would make it much easier to register the position of the camera by feel like you can do with a regular camera.
-3. Make the cloud services save the images to a filesystem and a database with their InceptionV3 labels and geolocations, then implement a searching service so I can make a webpage that allows you to search the images by their InceptionV3 labels and see them all on a map.
-4. Expand the IO of the ESP32 so I can use a SIM800L and a GPS featherwing at the same time.
-5. Swap out the InceptionV3 tensorflow model for a more accurate, or at least funnier one.
-6. Do some more image processing server-side to correct for white balance in particular.
-7. Make the CameraThing send me text messages when it successfully makes a tweet containing a link to the tweet that was created.
+3. Use a github action for continuous deployment of the cloud services.
+4. Make the cloud services save the images to a filesystem and a database with their InceptionV3 labels and geolocations, then implement a searching service so I can make a webpage that allows you to search the images by their InceptionV3 labels and see them all on a map.
+5. Expand the IO of the ESP32 so I can use a SIM800L and a GPS featherwing at the same time.
+6. Swap out the InceptionV3 tensorflow model for a more accurate, or at least funnier one.
+7. Do some more image processing server-side to correct for white balance in particular.
+8. Make the CameraThing send me text messages when it successfully makes a tweet containing a link to the tweet that was created.
 
 
 
