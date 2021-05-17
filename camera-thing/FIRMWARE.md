@@ -52,12 +52,6 @@ The GPIO pins used by the camera module are defined in `camera.cpp`.
 
 
 
-#### `geolocate.cpp`
-
-The Serial output used by the GPS module is defined in `geolocate.cpp` with the identifier `GPSSerial`. You may want to use a `HardwareSerial` to use custom GPIO pins.
-
-
-
 #### `gprsClient.cpp` and `gprsClient.h`
 
 The GPIO pins used for the SIM800L module are defined in `gprsClient.cpp` as follows:
@@ -77,6 +71,12 @@ The config for [TinyGsm](https://github.com/vshymanskyy/TinyGSM) are defined in 
 | TINY_GSM_MODEM_SIM800 |                                                              |
 | TINY_GSM_RX_BUFFER    | How big the buffer for receiving bytes from the SIM800L module should be |
 | SerialAT              | The Serial connection that should be used for the TinyGsm modem |
+
+
+
+#### `geolocate.cpp`
+
+The Serial output used by the GPS module is defined in `geolocate.cpp` with the identifier `GPSSerial`. You may want to use a `HardwareSerial` to use custom GPIO pins.
 
 
 
