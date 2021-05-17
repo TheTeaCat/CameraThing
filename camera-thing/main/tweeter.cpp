@@ -157,6 +157,9 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
 
     //Write up to chunkSize bytes
     int written = webClient.write((*jpgBuffer)+jpgWritten, chunkSize);
+
+    //Add the number of bytes written to the accumulator for logging later
+    jpgWritten += written;
     Serial.printf("[makeTweetRequest] - Written %d bytes of JPEG; %d out of %d so far\n", written, jpgWritten, *jpgLen);
 
     //If we wrote 0 bytes, something has gone wrong, so log and return false
@@ -164,9 +167,6 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
       Serial.printf("[makeTweetRequest] - Failed after writing %d out of %d bytes of JPEG\n", jpgWritten, *jpgLen);
       return false;
     }
-
-    //Add the number of bytes written to the accumulator for logging later
-    jpgWritten += written;
 
     //Break once we've written all the bytes!
     if(jpgWritten >= *jpgLen) {
