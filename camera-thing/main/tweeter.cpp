@@ -181,36 +181,45 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
   Serial.printf("[makeTweetRequest] - %d bytes out of %d written from request tail\n", tailWritten, strlen(reqTail));
   Serial.println("[makeTweetRequest] - Finished writing request");
 
-  //Await response from server with timeout
-  Serial.printf("[makeTweetRequest] - Awaiting response (read timeout %d ms)...", timeout);
-  int startTime = millis();
-  while(webClient.available() == 0) {
-    if(millis() - startTime > timeout) {
-      Serial.println(" timed out :(");
-      webClient.stop();
-      return false;
+  //We don't need to wait for a response from the tweeter under normal 
+  //conditions, but it is useful for debugging.
+  // #define RESPONSE_TO_SERIAL
+  #ifdef RESPONSE_TO_SERIAL
+    //Await response from server with timeout
+    Serial.printf("[makeTweetRequest] - Awaiting response (read timeout %d ms)...", timeout);
+    int startTime = millis();
+    while(webClient.available() == 0) {
+      if(millis() - startTime > timeout) {
+        Serial.println(" timed out :(");
+        webClient.stop();
+        return false;
+      }
+      WAIT_MS(1000);
+      Serial.print(".");
     }
-    WAIT_MS(1000);
-    Serial.print(".");
-  }
-  Serial.println(" success!");
+    Serial.println(" success!");
 
-  //Get response
-  Serial.println("[makeTweetRequest] -------------------------Response Start");
-  //Will be set to true if the response states a tweet was created
-  bool success = false;
-  //While there are bytes left to print...
-  while(webClient.available()) {
-    //Get a line...
-    String line = webClient.readStringUntil('\r');
-    //Print it to serial...
-    Serial.println(line);
-    //Then check if it states we succeeded...
-    if (line == "HTTP/1.1 201 Created") {
-      success = true;
+    //Get response
+    Serial.println("[makeTweetRequest] -------------------------Response Start");
+    //Will be set to true if the response states a tweet was created
+    bool success = false;
+    //While there are bytes left to print...
+    while(webClient.available()) {
+      //Get a line...
+      String line = webClient.readStringUntil('\r');
+      //Print it to serial...
+      Serial.println(line);
+      //Then check if it states we succeeded...
+      if (line == "HTTP/1.1 201 Created") {
+        success = true;
+      }
     }
-  }
-  Serial.println("[makeTweetRequest] -------------------------Response End");
+    Serial.println("[makeTweetRequest] -------------------------Response End");
+  #else
+    //If we're not actually waiting for a response from the server, just pretend
+    //it succeeded.
+    bool success = true;
+  #endif
 
   //Close wifi client
   webClient.stop();
