@@ -74,6 +74,10 @@ The full pinout I used on my CameraThing is as follows:
 | 34   | OV7670 D0         |
 | 35   | OV7670 D2         |
 
+Here's the pinout of the TTGO T-Call V1.4 sourced from the [LILYGO product page](http://www.lilygo.cn/prod_view.aspx?Id=1127):
+
+![TTGO T-Call V1.4 pinout](./docs/imgs/ttgo_tcall_v14_pinout.jpg)
+
 
 
 ## Image
