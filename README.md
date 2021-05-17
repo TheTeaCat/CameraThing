@@ -120,3 +120,17 @@ If I don't immediately disassemble my CameraThing to make something else, I migh
 4. Expand the IO of the ESP32 so I can use a SIM800L and a GPS featherwing at the same time.
 5. Swap out the InceptionV3 tensorflow model for a more accurate, or at least funnier one.
 6. Do some more image processing server-side to correct for white balance in particular.
+
+
+
+## Acknowledgements
+
+[This video](https://www.youtube.com/watch?v=S2yTQHM82jc), by "bitluni", was super helpful in figuring out how to get the OV7670 working.
+
+[esp32-camera](https://github.com/espressif/esp32-camera), the library I used to interface with the OV7670 which also provides a utility to perform JPEG compression.
+
+[This video](https://www.youtube.com/watch?v=aCeVsySh-v4), by Rui Santos, was also helpful in figuring out how to use the SIM800L module.
+
+[TinyGSM](https://github.com/vshymanskyy/TinyGSM), the library I used for the SIM800L module.
+
+Also, thanks to my flatmate Edward Hails for the nice button.
