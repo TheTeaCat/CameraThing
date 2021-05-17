@@ -23,7 +23,7 @@ To make one CameraThing you will need:
 
 ## Recipe
 
-Here is precisely how I did it, you can set up your breadboard differently or use different GPIO pins if you want to rearrange things.
+Here is precisely how I did it, you can set up your breadboard differently or use different GPIO pins if you want to rearrange things. There is a picture in the [Example Image](#example-image) section of this document.
 
 1. Jump the TTGO's 3.3v and ground pins to the +ve and -ve rails on your breadboard respectively.
 2. Wire up your button:
