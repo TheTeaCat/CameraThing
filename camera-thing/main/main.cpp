@@ -246,12 +246,17 @@ void loop() {
     //If we're using GPRS, we can send an SMS containing the tweet URL
     #ifdef APN
       if (tweetSuccess) {
+        myLed.throb(100,900);
         bool SMSSuccess = sendTweetText(tweetURL);
         if (!SMSSuccess) {
           Serial.println("Failed to send SMS :(");
+          myLed.flash(100); //flash(100) for hardware failure
+          WAIT_MS(3000);
+          ESP.restart();
         } else {
           Serial.println("Successfully sent SMS!");
         }
+        myLed.off();
       }
     #endif
 
