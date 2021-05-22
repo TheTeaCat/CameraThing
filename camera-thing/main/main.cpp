@@ -4,9 +4,14 @@
 #include <Arduino.h>
 #include "main.h"
 #include "utils.h"
+#include "secrets.h"
 #include "camera.h"
 #include "tweeter.h"
 #include "asyncLed.h"
+
+#ifdef APN
+  #include "gprsClient.h"
+#endif
 
 //I would like to use the GPS featherwing but I have actually just ran out of 
 //GPIO pins...
@@ -205,8 +210,19 @@ void loop() {
     //Communicate uploading by throbbing with fast attack, slow decay
     myLed.throb(900,100);
 
+    //Will contain the URL of the tweet
+    String tweetURL;
+
     //Upload the information to the tweet service
-    bool tweetSuccess = makeTweetRequest(30000,geolocationEnabled,lat,lon,&jpgBuffer,&jpgLen);
+    bool tweetSuccess = makeTweetRequest(
+      30000,
+      &tweetURL,
+      geolocationEnabled,
+      lat,
+      lon,
+      &jpgBuffer,
+      &jpgLen
+    );
 
     //If there is some err getting the data to the tweeter, signal an err and 
     //return.
@@ -217,10 +233,27 @@ void loop() {
       myLed.off();
       //Restart
       ESP.restart();
+    } else {
+      Serial.print("Tweet URL: ");
+      Serial.println(tweetURL);
     }
 
     //Turn the LED off now the upload is done
     myLed.off();
+
+    //////////////////////////////////////////////////////////////////////
+    //Success SMS 
+    //If we're using GPRS, we can send an SMS containing the tweet URL
+    #ifdef APN
+      if (tweetSuccess) {
+        bool SMSSuccess = sendTweetText(tweetURL);
+        if (!SMSSuccess) {
+          Serial.println("Failed to send SMS :(");
+        } else {
+          Serial.println("Successfully sent SMS!");
+        }
+      }
+    #endif
 
     //////////////////////////////////////////////////////////////////////
     //Cleanup

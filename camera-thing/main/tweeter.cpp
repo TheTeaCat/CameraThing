@@ -100,7 +100,7 @@ bool checkTweeterAccessible(int timeout) {
 //checks that the tweeter service returns a 201 Created response. If returns
 //false for fail, true for success. Pointers to the JPEG data are passed into
 //this function to save memory.
-bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
+bool makeTweetRequest(int timeout, String *tweetURL, bool geolocationEnabled, float lat, float lon, uint8_t **jpgBuffer, size_t *jpgLen) {
   //If we're using GPRS we need to restart the SIM800L every time
   #ifdef APN
     bool setupGPRS = setupNetworkConn();
@@ -181,10 +181,6 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
   Serial.printf("[makeTweetRequest] - %d bytes out of %d written from request tail\n", tailWritten, strlen(reqTail));
   Serial.println("[makeTweetRequest] - Finished writing request");
 
-  //We don't need to wait for a response from the tweeter under normal 
-  //conditions, but it is useful for debugging.
-  // #define RESPONSE_TO_SERIAL
-  #ifdef RESPONSE_TO_SERIAL
     //Await response from server with timeout
     Serial.printf("[makeTweetRequest] - Awaiting response (read timeout %d ms)...", timeout);
     int startTime = millis();
@@ -213,13 +209,15 @@ bool makeTweetRequest(int timeout, bool geolocationEnabled, float lat, float lon
       if (line == "HTTP/1.1 201 Created") {
         success = true;
       }
+    //And if it contains the tweet URL
+    int i = line.indexOf("\"TweetURL\":\"");
+    if (i >= 0) {
+      //12 = length of '"TweetURL":"'
+      int end = line.indexOf("\"",i+12);
+      *tweetURL = line.substring(i+12,end);
+    }
     }
     Serial.println("[makeTweetRequest] -------------------------Response End");
-  #else
-    //If we're not actually waiting for a response from the server, just pretend
-    //it succeeded.
-    bool success = true;
-  #endif
 
   //Close wifi client
   webClient.stop();

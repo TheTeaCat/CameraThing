@@ -21,32 +21,40 @@
   //long when we make another request
   bool SIM800LOn = false;
 
+  //powerSIM800L sets up power to the SIM800L
+  void powerSIM800L() {
+    //We don't need to do anything if the SIM800L is already on
+    if(SIM800LOn) {
+      return;
+    }
+
+    //Setup power
+    pinMode(SIM800L_PWRKEY, OUTPUT);
+    pinMode(SIM800L_RST, OUTPUT);
+    pinMode(SIM800L_POWER, OUTPUT);
+    digitalWrite(SIM800L_PWRKEY, LOW);
+    digitalWrite(SIM800L_RST, HIGH);
+    digitalWrite(SIM800L_POWER, HIGH);
+
+    //Give SIM800L 10 seconds to startup
+    Serial.println("[setupGPRSClient] - Giving 10s startup time to SIM800L...");
+    WAIT_MS(10000);
+
+    //Initialise SerialAT...
+    Serial.print("[setupGPRSClient] - Starting SerialAT...");
+    SerialAT.begin(4800, SERIAL_8N1, SIM800L_RX, SIM800L_TX);
+    WAIT_MS(3000);
+    Serial.println(" done :)");
+
+    //Set SIM800LOn to true because we've turned it on, now.
+    SIM800LOn = true;
+  }
+
   //setupGPRSClient sets up the GPRS connection for the TinyGSM client. It needs
   //to be called before every use of the webClient if using GPRS.
   bool setupGPRSClient() {
-    //Some things we only need to do once.
-    if(!SIM800LOn) {
-      //Setup power
-      pinMode(SIM800L_PWRKEY, OUTPUT);
-      pinMode(SIM800L_RST, OUTPUT);
-      pinMode(SIM800L_POWER, OUTPUT);
-      digitalWrite(SIM800L_PWRKEY, LOW);
-      digitalWrite(SIM800L_RST, HIGH);
-      digitalWrite(SIM800L_POWER, HIGH);
-
-      //Give SIM800L 10 seconds to startup
-      Serial.println("[setupGPRSClient] - Giving 10s startup time to SIM800L...");
-      WAIT_MS(10000);
-
-      //Initialise SerialAT...
-      Serial.print("[setupGPRSClient] - Starting SerialAT...");
-      SerialAT.begin(4800, SERIAL_8N1, SIM800L_RX, SIM800L_TX);
-      WAIT_MS(3000);
-      Serial.println(" done :)");
-
-      //Set SIM800LOn to true because we've turned it on, now.
-      SIM800LOn = true;
-    }
+    //Make sure the SIM800L is powered up
+    powerSIM800L();
 
     //Restart SIM800L...
     Serial.print("[setupGPRSClient] - Initializing modem...");
@@ -66,5 +74,32 @@
 
     //Return true for success!
     return true;
+  }
+
+  //sentTweetText sends a text to SMS_TARGET
+  bool sendTweetText(String tweetURL) {
+    #ifdef SMS_TARGET
+      //Make sure the SIM800L is powered up
+      powerSIM800L();
+
+      //Restart SIM800L...
+      Serial.print("[setupGPRSClient] - Initializing modem...");
+      if(!modem.restart()){
+        Serial.println(" fail :(");
+        return false;
+      }
+      Serial.println(" success!");
+
+      //Send text
+      bool res = modem.sendSMS(
+        SMS_TARGET,
+        "Hey, I made a new tweet! \n" + tweetURL
+      );
+
+      //Return success status
+      return res;
+    #else
+      return true;
+    #endif
   }
 #endif

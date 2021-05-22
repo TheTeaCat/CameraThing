@@ -22,4 +22,7 @@
 
   //Setup func
   bool setupGPRSClient();
+
+  //Func to send tweet SMS
+  bool sendTweetText(String tweetURL);
 #endif

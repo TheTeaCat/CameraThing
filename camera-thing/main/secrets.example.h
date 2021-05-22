@@ -13,6 +13,9 @@
 #define GPRS_USER "Put the username for your APN here :)"
 #define GPRS_PASS "Put the password for your APN here :)"
 
+//SMS_TARGET is the number to which SMSs will be sent when a tweet is made
+#define SMS_TARGET "Your number with +code"
+
 ///////////////////////////////////////////////////////////////////////////
 // Cloud services
 
